@@ -5,7 +5,7 @@ require('dotenv').config();
 
 async function inspect() {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://pfedora:pfedora@cluster0.va3ybm5.mongodb.net/?appName=Cluster0');
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('Database connected.');
 
     const emails = await Email.find().populate('candidateId');
