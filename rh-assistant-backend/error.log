@@ -1,0 +1,8 @@
+ERROR: JobPosting validation failed: description: Please add a description
+STACK: ValidationError: JobPosting validation failed: description: Please add a description
+    at Document.invalidate (C:\Users\brahi\OneDrive\Desktop\pfe dorra\rh-assistant-backend\node_modules\mongoose\lib\document.js:3381:32)
+    at C:\Users\brahi\OneDrive\Desktop\pfe dorra\rh-assistant-backend\node_modules\mongoose\lib\document.js:3142:17
+    at C:\Users\brahi\OneDrive\Desktop\pfe dorra\rh-assistant-backend\node_modules\mongoose\lib\schemaType.js:1443:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+BODY: {"title":"Frontend Developer","department":"Engineering","location":"Tunis, Tunisia (Hybrid)","type":"Full-time","description":"","requirements":"CSS, JavaScript, react","experience":"3 - 5 years","priority":"High","status":"Open","scoringCriteria":[{"skill":"CSS","points":30},{"skill":"JavaScript","points":50},{"skill":"react","points":20}],"createdBy":"6a0219abce8494d4e8d93d9c"}
+USER: {"_id":"6a0219abce8494d4e8d93d9c","name":"Sarah Johnson","email":"sarah.johnson@example.com","role":"HR","createdAt":"2026-05-11T18:02:19.220Z","updatedAt":"2026-05-11T18:02:19.220Z","__v":0}
