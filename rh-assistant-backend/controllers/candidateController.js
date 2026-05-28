@@ -40,12 +40,12 @@ exports.getCandidate = async (req, res) => {
 
 const sendEmail = require('../utils/emailService');
 
-// @desc    Update candidate status
+// @desc    Update candidate status or info
 // @route   PUT /api/candidates/:id
 // @access  Private
 exports.updateCandidateStatus = async (req, res) => {
   try {
-    const { status, notes, interviewDate } = req.body;
+    const { status, notes, interviewDate, personalInfo } = req.body;
     
     const candidate = await Candidate.findById(req.params.id);
 
@@ -56,6 +56,11 @@ exports.updateCandidateStatus = async (req, res) => {
     // Update fields
     if (status) candidate.status = status;
     if (notes) candidate.notes = notes;
+    if (personalInfo) {
+      candidate.personalInfo.fullName = personalInfo.fullName || candidate.personalInfo.fullName;
+      candidate.personalInfo.email = personalInfo.email || candidate.personalInfo.email;
+      candidate.personalInfo.phone = personalInfo.phone || candidate.personalInfo.phone;
+    }
     
     await candidate.save();
 
@@ -202,10 +207,10 @@ exports.uploadCvAndEvaluate = async (req, res) => {
       });
     }
     
-    // 3. Forward CV to brahimjaballi0@gmail.com with attached file to trigger n8n parsing pipeline
+    // 3. Forward CV to the configured inbox to trigger n8n parsing pipeline
     try {
       await sendEmail({
-        email: 'brahimjaballi0@gmail.com',
+        email: process.env.FROM_EMAIL,
         subject: `Application for ${jobTitle} - ${fullName || 'Manual Upload'}`,
         message: `A candidate resume was uploaded manually from the HR Assistant panel.\n\nFull Name: ${fullName || 'N/A'}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nJob Link: ${jobTitle}\n\nPlease trigger the parsing pipeline on the attached CV file.`,
         html: `<h3>Manual CV Ingestion Trigger</h3>
@@ -222,7 +227,7 @@ exports.uploadCvAndEvaluate = async (req, res) => {
           }
         ] : []
       });
-      console.log(`✉️ Automated CV evaluation email sent to brahimjaballi0@gmail.com for ${email}`);
+      console.log(`✉️ Automated CV evaluation email sent to ${process.env.FROM_EMAIL} for ${email}`);
     } catch (err) {
       console.error('Error forwarding CV attachment to n8n inbox:', err);
     }

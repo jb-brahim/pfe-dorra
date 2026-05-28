@@ -7,13 +7,14 @@ import { Home, Mail, Users, Briefcase, Calendar, BarChart3, Settings, LogOut, Me
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-
   const [unreadCount, setUnreadCount] = useState(0);
+  const { user, loading, logout } = useAuth();
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -37,6 +38,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // If on the login page, render children without the sidebar
+  const isLoginPage = pathname === '/login';
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  // Show nothing while checking auth
+  if (loading) return null;
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    return null;
+  }
 
   const navItems = [
     { href: '/dashboard', label: 'Home', icon: Home },
@@ -87,7 +105,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     "w-full justify-start gap-3 rounded-xl px-4 py-5 transition-all duration-300",
                     isActive(item.href)
                       ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/40 hover:scale-105"
-                      : "text-foreground hover:bg-white/10 dark:hover:bg-white/5"
+                      : "text-slate-600 hover:text-primary hover:bg-primary/10 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10"
                   )}
                 >
                   <Icon className="w-5 h-5" />
@@ -115,7 +133,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     "w-full justify-start gap-3 rounded-xl px-4 py-4 text-sm transition-all duration-300",
                     isActive(item.href)
                       ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/40"
-                      : "text-foreground hover:bg-white/10 dark:hover:bg-white/5"
+                      : "text-slate-600 hover:text-primary hover:bg-primary/10 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10"
                   )}
                 >
                   <Icon className="w-4 h-4" />
@@ -132,29 +150,33 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Crown className="w-6 h-6 mx-auto mb-2" />
             <h3 className="font-semibold text-sm mb-1">Upgrade to Pro</h3>
             <p className="text-xs opacity-90 mb-3">Unlock advanced features and boost your recruitment.</p>
-            <Button size="sm" className="w-full bg-white text-blue-600 hover:bg-white/90 font-semibold transition-all duration-300 hover:shadow-lg">
-              Upgrade Now
-            </Button>
+            <Link href="/upgrade" className="block w-full">
+              <Button 
+                size="sm" 
+                className="w-full bg-white text-blue-600 hover:bg-white/90 font-semibold transition-all duration-300 hover:shadow-lg"
+              >
+                Upgrade Now
+              </Button>
+            </Link>
           </div>
         </div>
 
         {/* User Profile */}
         <div className="p-4 border-t border-white/10 dark:border-white/5">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Dorra"
-              alt="User"
-              className="w-10 h-10 rounded-full ring-2 ring-blue-500/50"
-            />
-            <div className="flex-1">
-              <p className="font-medium text-sm text-foreground">Dorra Tagougi</p>
-              <p className="text-xs text-muted-foreground">HR Manager</p>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center ring-2 ring-blue-500/50 text-white font-black text-sm shrink-0">
+              {user.name?.[0]?.toUpperCase() || 'U'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm text-foreground truncate">{user.name}</p>
+              <p className="text-xs text-muted-foreground">{user.role}</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start gap-2 text-foreground hover:bg-white/10 dark:hover:bg-white/5 rounded-xl transition-all duration-300"
+            onClick={logout}
+            className="w-full justify-start gap-2 text-slate-600 hover:text-red-600 hover:bg-red-50 dark:text-slate-300 dark:hover:text-red-400 dark:hover:bg-red-950/30 rounded-xl transition-all duration-300"
           >
             <LogOut className="w-4 h-4" />
             Logout
@@ -175,7 +197,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="md:hidden h-16" /> {/* Mobile header spacing */}
+        <div className="md:hidden h-16" />
         <main className="flex-1 overflow-auto">
           {children}
         </main>

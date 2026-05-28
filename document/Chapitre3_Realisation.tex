@@ -1,0 +1,112 @@
+\chapter{Réalisation}
+
+\section*{Introduction}
+Ce chapitre est consacré à la phase de réalisation de notre projet. Nous y détaillons l'implémentation de la plateforme « RH Assistant » en suivant la méthodologie Agile Scrum. Le travail a été réparti sur quatre sprints principaux afin de garantir un développement itératif et maîtrisé. Pour chaque sprint, nous présenterons les \textit{User Stories} traitées, la modélisation correspondante, les choix et détails d'implémentation, ainsi que les tests effectués pour valider le bon fonctionnement des fonctionnalités.
+
+% =========================================================
+% SPRINT 1
+% =========================================================
+\section{Développement du Sprint 1 : Fondation et Sécurité}
+Ce premier sprint a pour objectif de mettre en place l'architecture de base du projet (Backend et Frontend) ainsi que d'implémenter le système d'authentification sécurisé.
+
+\subsection{User stories}
+\begin{itemize}
+    \item \textbf{US1.1 :} En tant qu'administrateur RH, je veux pouvoir me connecter à la plateforme de manière sécurisée avec mon email et mot de passe afin d'accéder au tableau de bord.
+    \item \textbf{US1.2 :} En tant que système, je veux crypter les mots de passe et générer des jetons d'accès (Tokens) pour sécuriser l'accès aux données sensibles.
+\end{itemize}
+
+\subsection{Modélisation}
+Pour ce sprint, le diagramme de cas d'utilisation se concentre sur l'acteur principal (Utilisateur / RH) qui interagit avec le module d'authentification. Au niveau de la base de données, la collection \texttt{Users} a été modélisée avec les champs essentiels : \texttt{email}, \texttt{passwordHash}, \texttt{role}, et \texttt{departmentId}.
+
+\subsection{Implémentation}
+Le backend a été initialisé avec le framework \textbf{Node.js} et \textbf{Express.js}. Nous avons utilisé la bibliothèque \texttt{bcrypt} pour le hachage des mots de passe (avec un facteur de sel élevé) et \texttt{jsonwebtoken} (JWT) pour la gestion des sessions sans état (Stateless). 
+Côté Frontend, le projet a été amorcé avec \textbf{Next.js} (React) et \textbf{Tailwind CSS} pour concevoir une interface de connexion épurée et responsive. La gestion globale de l'état utilisateur est assurée par \texttt{Zustand}.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{images/login_page.png}
+%     \caption{Interface d'authentification (Next.js)}
+%     \label{fig:login}
+% \end{figure}
+
+\subsection{Test}
+Des tests unitaires ont été réalisés sur le contrôleur \texttt{authController.js}. Nous avons également utilisé l'outil \textbf{Postman} pour vérifier que les routes protégées de l'API renvoient bien une erreur (401 Unauthorized) si la requête ne contient pas un JWT valide dans l'en-tête (Header).
+
+% =========================================================
+% SPRINT 2
+% =========================================================
+\section{Développement du Sprint 2 : Ingestion des Emails et Pipeline n8n}
+L'objectif de ce deuxième sprint est de connecter la boîte mail des ressources humaines à notre système afin d'automatiser la réception des candidatures.
+
+\subsection{User stories}
+\begin{itemize}
+    \item \textbf{US2.1 :} En tant que recruteur, je veux que les emails et les CV (PDF) envoyés par les candidats soient automatiquement interceptés par le système sans intervention manuelle.
+    \item \textbf{US2.2 :} En tant que système, je veux pouvoir recevoir les données extraites via un Webhook sécurisé pour les stocker dans la base de données.
+\end{itemize}
+
+\subsection{Modélisation}
+Le diagramme de séquence de ce sprint illustre l'interaction entre le serveur de messagerie (IMAP), la plateforme d'orchestration de flux de travail (n8n), et notre API Node.js. La collection \texttt{Emails} a été ajoutée au schéma de la base de données pour archiver toutes les communications interceptées.
+
+\subsection{Implémentation}
+Nous avons conçu un workflow complet sur \textbf{n8n} débutant par un nœud \texttt{Email Trigger (IMAP)}. Un nœud conditionnel (\texttt{If}) vérifie si le type MIME de la pièce jointe est \texttt{application/pdf}. 
+Sur le backend, nous avons implémenté le contrôleur \texttt{webhookController.js}. Celui-ci utilise le middleware \texttt{Multer} pour analyser les requêtes \texttt{multipart/form-data}, ce qui permet à l'API de recevoir simultanément le texte de l'email et le fichier binaire du CV, et de sauvegarder ce dernier dans le dossier \texttt{/uploads}.
+
+\subsection{Test}
+La validation de ce sprint a consisté à envoyer de multiples emails de test contenant diverses pièces jointes à la boîte de réception surveillée. Via l'interface de n8n, nous avons suivi l'exécution du flux en temps réel pour nous assurer que le Webhook était correctement déclenché et que le fichier PDF était bien enregistré physiquement sur notre serveur.
+
+% =========================================================
+% SPRINT 3
+% =========================================================
+\section{Développement du Sprint 3 : Intelligence Artificielle et Parsing}
+Ce sprint représente le cœur innovant du projet : l'extraction d'informations et l'analyse sémantique des CV par l'Intelligence Artificielle générative.
+
+\subsection{User stories}
+\begin{itemize}
+    \item \textbf{US3.1 :} En tant que système, je veux extraire automatiquement le texte des PDF et utiliser l'IA pour le convertir en données structurées (compétences, éducation, années d'expérience).
+    \item \textbf{US3.2 :} En tant que recruteur, je veux que le système catégorise l'email (Candidature, Réunion, Urgent) et attribue un score de correspondance (Matching Score) au candidat par rapport à l'offre.
+\end{itemize}
+
+\subsection{Modélisation}
+Le diagramme d'activité de l'IA détaille le processus de traitement : Extraction OCR $\rightarrow$ Ingénierie de prompt (Prompt Engineering) $\rightarrow$ Requête API vers le LLM $\rightarrow$ Formatage de la réponse JSON. Les collections \texttt{Candidates} et \texttt{Applications} ont été enrichies avec des attributs tels que \texttt{extractedSkills} et \texttt{aiScore}.
+
+\subsection{Implémentation}
+Dans le workflow n8n, nous avons intégré l'API haute performance de \textbf{Groq}. Nous avons configuré deux modèles distincts : 
+\begin{itemize}
+    \item \textbf{Llama-3.3-70b-versatile :} Utilisé pour l'analyse approfondie des CV complexes en raison de sa forte capacité de raisonnement.
+    \item \textbf{Llama-3.1-8b-instant :} Utilisé pour la classification ultra-rapide des emails généraux.
+\end{itemize}
+Un nœud \textit{Code JavaScript} personnalisé a été écrit pour capturer, nettoyer (retirer le formatage Markdown), et valider le JSON retourné par l'IA avant de le transmettre au backend. Sur le backend, un service métier évalue les compétences extraites par rapport aux exigences de l'offre d'emploi pour générer une note de 0 à 100.
+
+\subsection{Test}
+Les tests ont consisté à soumettre des CV de formats très variés et complexes au système. Nous avons particulièrement surveillé le risque "d'hallucination" de l'IA (invention de compétences). Les prompts ont été itérés et affinés jusqu'à obtenir un taux d'extraction de JSON valide de 100\%.
+
+% =========================================================
+% SPRINT 4
+% =========================================================
+\section{Développement du Sprint 4 : Tableau de Bord et Pipeline Kanban}
+Le dernier sprint se concentre sur l'Interface Utilisateur (UI/UX), offrant aux professionnels des RH un outil visuel moderne pour exploiter les données traitées par l'IA.
+
+\subsection{User stories}
+\begin{itemize}
+    \item \textbf{US4.1 :} En tant que recruteur, je veux gérer mes candidats via un tableau Kanban interactif (Nouveau, Entretien, Offre, Refus).
+    \item \textbf{US4.2 :} En tant que manager, je veux visualiser une vue de profil scindée montrant les résultats de l'IA à côté du CV PDF original.
+\end{itemize}
+
+\subsection{Modélisation}
+Le diagramme de classes finalise les relations entre les entités \texttt{Jobs}, \texttt{Candidates} et \texttt{Applications}. L'interface interactive Kanban nécessite une conception complexe des états (State) modélisée par le cycle de vie des composants React.
+
+\subsection{Implémentation}
+Sur le frontend (Next.js), nous avons utilisé des bibliothèques avancées telles que \texttt{react-beautiful-dnd} pour implémenter la fonctionnalité de glisser-déposer (Drag and Drop) du pipeline Kanban. La page de profil du candidat a été conçue en mode \textit{Split-Pane} (écran divisé) : la gauche affiche de manière élégante les puces générées par l'IA (skills, summary), tandis que la droite intègre un composant de visualisation PDF. Des graphiques analytiques ont également été intégrés au tableau de bord principal à l'aide de \texttt{Recharts}.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.9\textwidth]{images/kanban_board.png}
+%     \caption{Tableau Kanban de gestion des candidatures}
+%     \label{fig:kanban}
+% \end{figure}
+
+\subsection{Test}
+Des tests d'intégration complets (End-to-End) ont été menés pour simuler le flux opérationnel réel : nous avons envoyé un email, attendu quelques secondes le traitement par n8n et Groq, puis vérifié que l'application React se mettait à jour pour faire apparaître la carte du nouveau candidat avec son score IA dans la colonne appropriée du tableau Kanban.
+
+\section*{Conclusion}
+Ce chapitre a permis de mettre en lumière la démarche technique, méthodique et concrète adoptée pour réaliser l'application « RH Assistant ». L'approche par Sprints (Agile) a assuré un développement progressif et maîtrisé, en consolidant d'abord le socle technique, avant de déployer l'intégration complexe de l'Intelligence Artificielle et de terminer par une interface riche et interactive. Les tests rigoureux menés à chaque étape garantissent aujourd'hui la stabilité, la performance, et la fiabilité de cette plateforme innovante.

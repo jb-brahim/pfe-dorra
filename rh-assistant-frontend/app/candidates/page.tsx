@@ -163,7 +163,7 @@ export default function CandidatesPage() {
       formData.append('jobId', aiUploadForm.jobId);
       formData.append('cv', selectedFile);
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://pfe-dorra.onrender.com/api';
       const res = await fetch(`${API_URL}/candidates/upload-cv`, {
         method: 'POST',
         body: formData

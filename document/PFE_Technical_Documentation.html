@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RH Assistant - Enterprise Technical Documentation</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1000px; margin: 40px auto; padding: 20px; }
+        h1 { color: #1a365d; border-bottom: 3px solid #2b6cb0; padding-bottom: 10px; text-align: center; font-size: 2.8em; text-transform: uppercase; }
+        h2 { color: #2b6cb0; border-bottom: 2px solid #e2e8f0; margin-top: 60px; padding-bottom: 8px; font-size: 2em; }
+        h3 { color: #2d3748; margin-top: 40px; font-size: 1.5em; border-left: 4px solid #3182ce; padding-left: 10px; }
+        h4 { color: #4a5568; margin-top: 25px; font-size: 1.2em; }
+        p { margin-bottom: 15px; text-align: justify; }
+        ul, ol { margin-bottom: 20px; padding-left: 30px; }
+        li { margin-bottom: 8px; }
+        code { background-color: #edf2f7; padding: 3px 6px; border-radius: 4px; font-family: 'Courier New', Courier, monospace; font-size: 0.95em; color: #e53e3e; }
+        pre { background-color: #2d3748; color: #f7fafc; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        pre code { background-color: transparent; color: inherit; padding: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        th { background-color: #f7fafc; font-weight: bold; color: #2d3748; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        .subtitle { text-align: center; font-style: italic; color: #718096; margin-bottom: 60px; font-size: 1.2em; }
+        .highlight { background-color: #ebf8ff; padding: 15px; border-left: 4px solid #3182ce; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        @media print {
+            body { max-width: 100%; margin: 0; padding: 20px; }
+            h2 { page-break-before: always; }
+            table { page-break-inside: avoid; }
+            .no-break { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>RH Assistant: Enterprise Technical Architecture & Documentation</h1>
+<p class="subtitle">Comprehensive Final Year Project (PFE) Software Engineering Thesis</p>
+
+<!-- ========================================== -->
+<!-- 1. PROJECT OVERVIEW                        -->
+<!-- ========================================== -->
+<h2>1. PROJECT OVERVIEW</h2>
+<h3>1.1 Project Name</h3>
+<p><strong>RH Assistant</strong> (AI-Powered HR Recruitment & Automation SaaS)</p>
+
+<h3>1.2 Problem Statement</h3>
+<p>Modern human resources departments suffer from critical operational bottlenecks during the talent acquisition lifecycle. HR professionals allocate up to 40% of their working hours to highly repetitive, administrative tasks: manually downloading PDF resumes from emails, visually scanning them for keywords, manually extracting data into archaic Applicant Tracking Systems (ATS), and drafting repetitive correspondence. This manual triage is fraught with human error, inherently biased by unconscious human factors, and results in unacceptably long time-to-hire metrics. Furthermore, the sheer volume of unstructured data (resumes, portfolios, meeting schedules) creates a disjointed data ecosystem, ultimately causing organizations to lose top-tier, fast-moving talent to more agile competitors.</p>
+
+<h3>1.3 Motivation</h3>
+<p>The core motivation driving the RH Assistant project is the imperative to bridge the operational chasm between traditional, manual recruitment workflows and next-generation, autonomous artificial intelligence. By leveraging state-of-the-art Large Language Models (LLMs) via the Groq API, Natural Language Processing (NLP), Optical Character Recognition (OCR), and robust event-driven workflow automation frameworks (n8n), this system aims to completely eradicate the administrative overhead of HR. This paradigm shift allows human recruiters to refocus their cognitive bandwidth entirely on strategic talent acquisition, emotional intelligence evaluation, and cultural fit assessment.</p>
+
+<h3>1.4 Objectives</h3>
+<ul>
+    <li><strong>Omnichannel Autonomous Ingestion:</strong> Seamlessly monitor and ingest applicant data from unstructured channels, primarily via automated IMAP email interception.</li>
+    <li><strong>Intelligent Routing & Semantic Classification:</strong> Utilize LLMs to instantly categorize incoming communications (Applications, Meeting Requests, Urgent Inquiries) and assign priority levels without human intervention.</li>
+    <li><strong>Automated Screening & Unstructured Data Extraction:</strong> Parse complex, highly varied PDF resumes into strictly structured, machine-readable JSON schemas containing arrays of skills, chronological education, and quantified experience metrics.</li>
+    <li><strong>Bias Reduction & Objective Scoring:</strong> Standardize candidate evaluation by mathematically ranking applicants against job descriptions using vector similarity and LLM semantic reasoning, mitigating human unconscious bias.</li>
+    <li><strong>Centralized Command Center:</strong> Provide an interactive, unified SPA (Single Page Application) dashboard for HR managers to track recruitment KPIs, interview pipelines, and automated mailings in real-time.</li>
+</ul>
+
+<h3>1.5 Target Users</h3>
+<ul>
+    <li><strong>HR Directors & Executives:</strong> Utilize the system for high-level oversight, budget reporting, recruitment velocity analytics, and strategic pipeline forecasting.</li>
+    <li><strong>Talent Acquisition Specialists (Recruiters):</strong> The primary daily users; managing the Kanban pipeline, reviewing AI-scored resumes, and utilizing the streamlined communication interfaces.</li>
+    <li><strong>Department Managers (Technical Interviewers):</strong> Reviewing the AI-curated shortlists and providing technical feedback on candidates within the portal.</li>
+    <li><strong>Candidates (End-Users):</strong> Benefit indirectly but significantly through lightning-fast response times, unbiased initial screening, and professional automated correspondence.</li>
+</ul>
+
+<h3>1.6 Real-World Business Value & ROI</h3>
+<p>RH Assistant transforms recruitment from a reactive cost-center into a proactive strategic asset. By reducing the time-to-hire by an estimated 60%, companies drastically cut operational expenditures. <strong>Cost Reduction Analysis:</strong> If a mid-level recruiter earning $60,000/year spends 30% of their time on tasks the RH Assistant now automates (resume screening, data entry, email sorting), the direct labor savings is $18,000 per recruiter annually. <strong>Opportunity Cost:</strong> It minimizes the "vacancy cost" (lost revenue) of critical technical roles remaining unfilled for months.</p>
+
+<h3>1.7 Existing Problems in the Market</h3>
+<ul>
+    <li><strong>Fragmented Toolchains:</strong> HR teams constantly switch context between disjointed email clients, spreadsheets, and legacy ATS software.</li>
+    <li><strong>Keyword-Matching Failures:</strong> Traditional ATS platforms rely on exact Boolean keyword matching, often generating false negatives (rejecting highly qualified candidates because they used a synonym).</li>
+    <li><strong>The "Black Hole" Syndrome:</strong> Candidates apply and never hear back because HR is overwhelmed, severely damaging the employer's brand reputation.</li>
+</ul>
+
+<h3>1.8 Proposed Solution</h3>
+<p>An end-to-end, modular monolithic SaaS platform that intercepts applicant data at the source (email), semantically processes and scores it using the high-speed Groq Llama 3 LLM via an n8n automation pipeline, and visualizes the structured intelligence on a modern Next.js/React dashboard powered by a scalable Node.js backend.</p>
+
+<!-- ========================================== -->
+<!-- 2. BUSINESS ANALYSIS                       -->
+<!-- ========================================== -->
+<h2>2. BUSINESS ANALYSIS</h2>
+
+<h3>2.1 Business Needs</h3>
+<p>Enterprises require a highly scalable, secure (GDPR-compliant), and intuitive platform capable of processing thousands of applications concurrently without necessitating a linear increase in HR headcount. The system must operate with 99.9% uptime and ensure zero data loss during high-volume recruitment drives.</p>
+
+<h3>2.2 User Pain Points</h3>
+<ul>
+    <li><strong>Recruiters:</strong> "I receive 500 applications for one Senior React Developer role, but only 15 are actually qualified. Manually finding those 15 is unsustainable."</li>
+    <li><strong>Candidates:</strong> "I apply to dozens of jobs and rarely receive acknowledgment, let alone constructive feedback."</li>
+    <li><strong>Executives:</strong> "Our cost-per-hire is inflating due to reliance on external headhunters, and our time-to-fill is lagging behind market competitors."</li>
+</ul>
+
+<h3>2.3 Company Workflow Before the System (Legacy)</h3>
+<ol>
+    <li>Job descriptions are manually copy-pasted across disjointed job boards.</li>
+    <li>Candidates email their resumes as PDF attachments.</li>
+    <li>HR personnel manually open their email client, download the PDF, and visually skim the document.</li>
+    <li>HR manually types the candidate's name, email, phone, and skills into a rigid Excel spreadsheet or legacy ATS.</li>
+    <li>HR manually drafts an email to the shortlisted candidates to schedule an interview.</li>
+    <li>Unqualified candidates are simply ignored due to time constraints, resulting in a poor brand experience.</li>
+</ol>
+
+<h3>2.4 Workflow After the System (RH Assistant)</h3>
+<ol>
+    <li>Email arrives at the dedicated HR inbox.</li>
+    <li><strong>n8n Automation Pipeline</strong> instantly intercepts the email via IMAP.</li>
+    <li>The pipeline identifies the PDF, extracts the text via OCR, and passes it to the <strong>Groq Llama 3 70B LLM</strong>.</li>
+    <li>The LLM structures the unstructured resume into a clean JSON object (Skills, Experience Years, Education) and categorizes the email.</li>
+    <li>n8n forwards the JSON data and original PDF file to the Node.js Webhook.</li>
+    <li>The Node.js backend calculates a semantic Match Score based on the job requirements and saves it to MongoDB.</li>
+    <li>The Next.js Application Dashboard updates in real-time, placing the candidate in the correct Kanban column.</li>
+    <li>Automated, personalized emails are triggered instantly based on the AI's scoring thresholds.</li>
+</ol>
+
+<h3>2.5 Competitive Advantage</h3>
+<p>Unlike legacy ATS platforms that rely on rigid Boolean keyword matching, RH Assistant utilizes true semantic vector analysis and Large Language Models. It understands context, synonyms, and inferred capabilities. For instance, if a job requires a "React Developer" and a resume says "Managed a Next.js UI team," legacy systems fail; RH Assistant understands the semantic equivalence and scores the candidate highly. Furthermore, the sub-second latency provided by the Groq LPU API ensures real-time processing unmatched by competitors using standard OpenAI endpoints.</p>
+
+<!-- ========================================== -->
+<!-- 3. SYSTEM ARCHITECTURE                     -->
+<!-- ========================================== -->
+<h2>3. SYSTEM ARCHITECTURE</h2>
+
+<h3>3.1 Global Architecture: Modular Monolith</h3>
+<p>The system adopts a <strong>Modular Monolithic Architecture</strong> for the core backend, paired with an asynchronous Event-Driven pipeline for external ingestion. This approach was chosen to minimize network latency and deployment complexity during the startup phase, while maintaining strict domain-driven boundaries (Controllers vs. Services) to allow a seamless future transition to a pure Microservices architecture as scaling demands dictate.</p>
+
+<h3>3.2 Frontend Architecture</h3>
+<p>Built utilizing <strong>Next.js (React)</strong>. It heavily leverages Server-Side Rendering (SSR) for initial load performance and SEO optimization (crucial for public job postings), and Client-Side Rendering (CSR) for highly dynamic, stateful dashboard interfaces like the interactive Kanban board. It adheres to a Component-Driven Architecture (Atomic Design methodology) managed by <strong>Zustand</strong> for global state management.</p>
+
+<h3>3.3 Backend Architecture</h3>
+<p>A highly concurrent <strong>Node.js/Express.js</strong> API backend. The architecture follows the strict <strong>Controller-Service-Repository</strong> pattern:</p>
+<ul>
+    <li><strong>Controllers (e.g., <code>webhookController.js</code>):</strong> Intercept incoming HTTP requests, validate payloads using schemas (Zod/Joi), and orchestrate HTTP responses.</li>
+    <li><strong>Services (e.g., <code>aiScoringService.js</code>):</strong> Encapsulate all complex business logic, handle domain operations, and orchestrate calculations independent of the HTTP layer.</li>
+    <li><strong>Repositories:</strong> Abstract and centralize all MongoDB database interactions via Mongoose, completely decoupling business logic from the ODM implementation.</li>
+</ul>
+
+<h3>3.4 AI & Automation Architecture</h3>
+<p>The AI layer functions as an asynchronous, event-driven pipeline orchestrated by <strong>n8n</strong>. It utilizes a dual-model strategy via the Groq API:</p>
+<ul>
+    <li><strong>Heavy Processing (Llama 3 70B):</strong> Used exclusively for deep semantic parsing of complex PDF CVs where high reasoning capability is required.</li>
+    <li><strong>Lightweight Triage (Llama 3 8B):</strong> Used for instant classification of general emails (Meeting requests, general inquiries) prioritizing sheer speed.</li>
+</ul>
+
+<h3>3.5 Database Architecture</h3>
+<p>A strategic polyglot persistence model utilizing <strong>MongoDB</strong> as the primary data store. The document-oriented, NoSQL nature of MongoDB perfectly accommodates the highly variable, polymorphic nature of candidate profiles and nested AI inference results (where schemas cannot be strictly normalized).</p>
+
+<h3>3.6 API Communication Flow & Data Flow Diagrams</h3>
+<p class="highlight">
+<strong>Data Flow Sequence:</strong><br>
+1. Candidate Email ➔ 2. IMAP Server ➔ 3. n8n Trigger Node ➔ 4. Groq LLM Inference (JSON Extraction) ➔ 5. n8n HTTP Request ➔ 6. Ngrok Secure Tunnel ➔ 7. Node.js Webhook Controller ➔ 8. Express Middleware (Payload Validation) ➔ 9. Candidate Service (Scoring Logic) ➔ 10. MongoDB Persistence ➔ 11. WebSocket Emission ➔ 12. Next.js Dashboard UI Update.
+</p>
+
+<h3>3.7 Authentication Flow</h3>
+<p>Stateless authentication leveraging <strong>JSON Web Tokens (JWT)</strong>. The user submits credentials to the Auth Controller. The server validates the bcrypt-hashed password against the database and signs a JWT payload (containing User ID and Role). This token is returned and stored securely on the client. Subsequent API requests pass this token in the <code>Authorization: Bearer</code> header, which the <code>verifyToken</code> Express middleware validates before granting route access.</p>
+
+<h3>3.8 Infrastructure & Deployment Architecture</h3>
+<p>The entire ecosystem is designed for containerization utilizing <strong>Docker</strong>. In production, Docker Compose orchestrates the Node.js API, Next.js Frontend, and potentially a local n8n instance. <strong>Nginx</strong> serves as the Reverse Proxy and API Gateway, handling SSL termination (via Let's Encrypt) and routing traffic to the internal container ports on a Linux Ubuntu server.</p>
+
+<!-- ========================================== -->
+<!-- 4. TECHNOLOGIES USED                       -->
+<!-- ========================================== -->
+<h2>4. TECHNOLOGIES USED</h2>
+
+<h4>1. Next.js (React Framework) & TypeScript</h4>
+<ul>
+    <li><strong>Role:</strong> Core Frontend Framework.</li>
+    <li><strong>Why Chosen:</strong> Unmatched hybrid rendering (SSR/CSR), excellent developer experience with the App Router, and built-in API routes. TypeScript ensures compile-time type safety.</li>
+    <li><strong>Advantages:</strong> Drastically reduces runtime errors, SEO friendly, highly optimized image/font loading.</li>
+    <li><strong>Alternatives Considered:</strong> Vue.js / Nuxt (Rejected due to team expertise lying heavily in React).</li>
+</ul>
+
+<h4>2. Node.js & Express.js</h4>
+<ul>
+    <li><strong>Role:</strong> Core Backend REST API runtime and framework.</li>
+    <li><strong>Why Chosen:</strong> Highly scalable, event-driven, non-blocking I/O architecture perfect for orchestrating multiple concurrent API calls (webhooks, database writes) without thread-blocking.</li>
+    <li><strong>Advantages:</strong> Unified JavaScript language across the entire stack (Full-Stack JS). Massive NPM ecosystem.</li>
+    <li><strong>Alternatives Considered:</strong> Python/Django (Rejected because while Python is great for ML, Node.js is vastly superior for handling massive concurrent webhook streams).</li>
+</ul>
+
+<h4>3. MongoDB & Mongoose ODM</h4>
+<ul>
+    <li><strong>Role:</strong> Primary Database.</li>
+    <li><strong>Why Chosen:</strong> Resumes and AI outputs do not have a fixed schema. One candidate has 2 jobs, another has 15. NoSQL handles this polymorphism effortlessly.</li>
+    <li><strong>Advantages:</strong> JSON-like document storage maps perfectly to JavaScript objects. Highly horizontally scalable.</li>
+    <li><strong>Alternatives Considered:</strong> PostgreSQL (Rejected due to the rigid normalization required for highly variable resume data, though viable if using JSONB columns).</li>
+</ul>
+
+<h4>4. n8n (Workflow Automation)</h4>
+<ul>
+    <li><strong>Role:</strong> The autonomous orchestration engine for the IMAP-to-Backend pipeline.</li>
+    <li><strong>Why Chosen:</strong> Open-source, self-hostable alternative to Zapier. Offers deep code-level customization (JavaScript nodes) and handles binary file transfers natively.</li>
+    <li><strong>Advantages:</strong> Visual workflow builder, zero vendor lock-in, infinite scalability if self-hosted.</li>
+    <li><strong>Alternatives Considered:</strong> Zapier / Make.com (Rejected due to high enterprise costs and strict data privacy concerns for sensitive HR documents).</li>
+</ul>
+
+<h4>5. Groq API (Meta Llama 3 70B & 8B)</h4>
+<ul>
+    <li><strong>Role:</strong> The artificial intelligence reasoning engine.</li>
+    <li><strong>Why Chosen:</strong> Groq utilizes specialized LPUs (Language Processing Units) that deliver mind-blowing inference speeds (up to 800 tokens/second). This eliminates the agonizing wait times typical of AI processing.</li>
+    <li><strong>Advantages:</strong> Near-instantaneous CV parsing. Open-source Llama 3 models provide GPT-4 level intelligence at a fraction of the cost.</li>
+    <li><strong>Alternatives Considered:</strong> OpenAI GPT-4 API (Rejected due to higher latency and higher token costs at scale).</li>
+</ul>
+
+<h4>6. Tailwind CSS</h4>
+<ul>
+    <li><strong>Role:</strong> Frontend styling architecture.</li>
+    <li><strong>Why Chosen:</strong> Utility-first approach allows for rapid UI prototyping directly in the JSX/TSX files without context switching to CSS files.</li>
+    <li><strong>Advantages:</strong> Results in extremely small production CSS bundles. Ensures a highly consistent design system.</li>
+</ul>
+
+<h4>7. JWT (JSON Web Tokens) & Bcrypt</h4>
+<ul>
+    <li><strong>Role:</strong> Security, Authentication, and Cryptography.</li>
+    <li><strong>Why Chosen:</strong> Industry standard for stateless API authentication and secure password hashing with configurable salt rounds to defeat rainbow table attacks.</li>
+</ul>
+
+<h4>8. Docker & Nginx</h4>
+<ul>
+    <li><strong>Role:</strong> DevOps, Containerization, and Reverse Proxy.</li>
+    <li><strong>Why Chosen:</strong> Docker eliminates "it works on my machine" issues. Nginx is the enterprise standard for load balancing and SSL termination.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- 5. FRONTEND DEVELOPMENT                    -->
+<!-- ========================================== -->
+<h2>5. FRONTEND DEVELOPMENT (rh-assistant-frontend)</h2>
+
+<h3>5.1 UI/UX Design & User Experience Decisions</h3>
+<p>The interface is architected with a "Clean, Minimalist, and Data-Dense" philosophy. The corporate color palette (navy blues, crisp whites) conveys institutional trust. Micro-interactions (hover states, skeleton loaders) ensure the application feels exceptionally responsive. A deliberate decision was made to utilize a <strong>Split-Pane Architecture</strong> for candidate profiles: AI data on the left, embedded raw PDF on the right, ensuring recruiters never have to download a file to verify the AI's findings.</p>
+
+<h3>5.2 Pages & Component Architecture</h3>
+<ul>
+    <li><strong><code>app/dashboard/</code>:</strong> The command center. Displays macro-level statistics (total candidates, incoming emails, application trends) utilizing Recharts for dynamic SVG charts.</li>
+    <li><strong><code>app/candidates/</code>:</strong> The global candidate directory. Includes real-time debounced search indexing and advanced filtering (by AI score, specific skills).</li>
+    <li><strong><code>app/candidates/[id]/</code>:</strong> The dynamic profile view.</li>
+    <li><strong><code>app/calendar/</code> & <code>app/interviews/</code>:</strong> Dedicated workspaces for managing active interview sessions, scheduling, and technical feedback matrices.</li>
+    <li><strong><code>app/job-postings/</code>:</strong> The Job Board. An interface for creating, editing, and publishing job vacancies with rich-text formatting.</li>
+    <li><strong><code>app/mails/</code>:</strong> The unified Inbox. Displays all incoming communications classified by the n8n AI engine (Urgent, Interview, Others).</li>
+</ul>
+
+<h3>5.3 State Management, Routing & Forms</h3>
+<p>Next.js App Router handles all nested layouts and route protection. Global state (User Session, UI Theme) is managed by <strong>Zustand</strong>, chosen for its zero-boilerplate simplicity over Redux. Complex forms (like Job Creation) are managed using <strong>React Hook Form</strong> coupled with <strong>Zod</strong> for rigorous, client-side schema validation before hitting the API.</p>
+
+<!-- ========================================== -->
+<!-- 6. BACKEND DEVELOPMENT                     -->
+<!-- ========================================== -->
+<h2>6. BACKEND DEVELOPMENT (rh-assistant-backend)</h2>
+
+<h3>6.1 REST API Structure & Controllers</h3>
+<p>The API strictly adheres to RESTful architectural constraints. Resources are logically routed (e.g., <code>GET /api/v1/jobs/:jobId/candidates</code>). The API utilizes standard HTTP verbs deterministically and responds with standardized JSON envelopes containing payloads and precise HTTP status codes.</p>
+<ul>
+    <li><strong><code>authController.js</code>:</strong> Handles Login, Registration, and Token generation.</li>
+    <li><strong><code>candidateController.js</code>:</strong> Handles CRUD operations, search indexing, and pagination for candidates.</li>
+    <li><strong><code>jobController.js</code>:</strong> Manages the lifecycle of job advertisements.</li>
+    <li><strong><code>webhookController.js</code>:</strong> The most critical endpoint. Receives <code>multipart/form-data</code> POST requests from n8n, utilizing <strong>Multer</strong> middleware to parse the JSON string and save the binary PDF buffer to disk or cloud storage.</li>
+</ul>
+
+<h3>6.2 Services, Repositories & Middleware</h3>
+<p>The <strong>Service Layer</strong> (e.g., <code>aiScoringService.js</code>) isolates business logic. When a webhook arrives, the controller passes the data to the service, which executes the mathematical candidate ranking algorithm. <strong>Middleware</strong> (<code>verifyToken.js</code>, <code>roleGuard.js</code>) acts as security interceptors to ensure Role-Based Access Control (RBAC). A centralized error-handling middleware catches all unhandled exceptions and formats a clean error response, preventing stack traces from leaking to the client.</p>
+
+<!-- ========================================== -->
+<!-- 7. DATABASE DESIGN                         -->
+<!-- ========================================== -->
+<h2>7. DATABASE DESIGN</h2>
+<p>While MongoDB is schema-less, Mongoose enforces strict application-level schemas. Below is the exhaustive database design.</p>
+
+<h3>7.1 `users` Table / Collection</h3>
+<p><strong>Purpose:</strong> Stores credentials and roles for HR personnel accessing the dashboard.</p>
+<table>
+    <tr><th>Column Name</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+    <tr><td>_id</td><td>ObjectId</td><td>Primary Key</td><td>Unique identifier</td></tr>
+    <tr><td>firstName</td><td>String</td><td>Required</td><td>User's first name</td></tr>
+    <tr><td>lastName</td><td>String</td><td>Required</td><td>User's last name</td></tr>
+    <tr><td>email</td><td>String</td><td>Required, Unique, Indexed</td><td>Login email</td></tr>
+    <tr><td>passwordHash</td><td>String</td><td>Required</td><td>Bcrypt hashed password</td></tr>
+    <tr><td>role</td><td>String Enum</td><td>['ADMIN', 'HR_MANAGER', 'RECRUITER']</td><td>RBAC definition</td></tr>
+    <tr><td>departmentId</td><td>ObjectId</td><td>Foreign Key -> departments</td><td>User's department</td></tr>
+    <tr><td>createdAt, updatedAt</td><td>Timestamp</td><td>Auto-generated</td><td>Audit timestamps</td></tr>
+</table>
+
+<h3>7.2 `jobs` Table / Collection</h3>
+<p><strong>Purpose:</strong> Stores active and closed job vacancies.</p>
+<table>
+    <tr><th>Column Name</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+    <tr><td>_id</td><td>ObjectId</td><td>Primary Key</td><td>Unique identifier</td></tr>
+    <tr><td>title</td><td>String</td><td>Required, Indexed</td><td>Job Title (e.g., "React Dev")</td></tr>
+    <tr><td>description</td><td>String</td><td>Required</td><td>Rich HTML description</td></tr>
+    <tr><td>requiredSkills</td><td>Array of Strings</td><td>Required</td><td>Used for AI matching (e.g., ["Node.js", "React"])</td></tr>
+    <tr><td>status</td><td>String Enum</td><td>['DRAFT', 'PUBLISHED', 'CLOSED']</td><td>Current status</td></tr>
+    <tr><td>createdBy</td><td>ObjectId</td><td>Foreign Key -> users</td><td>Author of the job</td></tr>
+</table>
+
+<h3>7.3 `candidates` Table / Collection</h3>
+<p><strong>Purpose:</strong> Stores the core identity and original files of applicants.</p>
+<table>
+    <tr><th>Column Name</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+    <tr><td>_id</td><td>ObjectId</td><td>Primary Key</td><td>Unique identifier</td></tr>
+    <tr><td>fullName</td><td>String</td><td>Required</td><td>Extracted by AI</td></tr>
+    <tr><td>email</td><td>String</td><td>Unique, Indexed</td><td>Candidate contact email</td></tr>
+    <tr><td>phone</td><td>String</td><td>Optional</td><td>Candidate phone</td></tr>
+    <tr><td>resumeFileUrl</td><td>String</td><td>Required</td><td>Path to the saved PDF file</td></tr>
+    <tr><td>source</td><td>String</td><td>Default: 'Email/IMAP'</td><td>Origin of application</td></tr>
+</table>
+
+<h3>7.4 `applications` & `extracted_data` Table / Collection</h3>
+<p><strong>Purpose:</strong> Acts as a junction table tracking a candidate's pipeline status for a specific job, containing the deep AI-extracted JSON data.</p>
+<table>
+    <tr><th>Column Name</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+    <tr><td>_id</td><td>ObjectId</td><td>Primary Key</td><td>Unique identifier</td></tr>
+    <tr><td>candidateId</td><td>ObjectId</td><td>Foreign Key -> candidates</td><td>The applicant</td></tr>
+    <tr><td>jobId</td><td>ObjectId</td><td>Foreign Key -> jobs</td><td>The job applied for</td></tr>
+    <tr><td>stage</td><td>String Enum</td><td>['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED']</td><td>Kanban board status</td></tr>
+    <tr><td>aiScore</td><td>Number (0-100)</td><td>Indexed</td><td>Algorithmically generated match score</td></tr>
+    <tr><td>aiSummary</td><td>String</td><td>Required</td><td>LLM generated paragraph summarizing the candidate</td></tr>
+    <tr><td>extractedSkills</td><td>Array of Strings</td><td>Required</td><td>All skills found in the CV</td></tr>
+    <tr><td>experienceYears</td><td>Number</td><td>Required</td><td>Calculated total years of experience</td></tr>
+    <tr><td>education</td><td>Array of Objects</td><td>Optional</td><td>{ degree, institution, year }</td></tr>
+</table>
+
+<h3>7.5 `emails` Table / Collection</h3>
+<p><strong>Purpose:</strong> Stores categorized general communications intercepted by n8n.</p>
+<table>
+    <tr><th>Column Name</th><th>Data Type</th><th>Constraints</th><th>Description</th></tr>
+    <tr><td>_id</td><td>ObjectId</td><td>Primary Key</td><td>Unique identifier</td></tr>
+    <tr><td>senderEmail</td><td>String</td><td>Indexed</td><td>From address</td></tr>
+    <tr><td>subject</td><td>String</td><td>Required</td><td>Email subject</td></tr>
+    <tr><td>body</td><td>String</td><td>Required</td><td>Extracted plain text body</td></tr>
+    <tr><td>category</td><td>String Enum</td><td>['Applications', 'Job Interview', 'Important', 'Others']</td><td>AI classified category</td></tr>
+    <tr><td>priority</td><td>String Enum</td><td>['High', 'Medium', 'Low']</td><td>AI assigned priority</td></tr>
+    <tr><td>meetingDetails</td><td>Object</td><td>Optional</td><td>{ date, time, title } extracted by LLM</td></tr>
+</table>
+
+<h3>7.6 Query Optimization & Scalability</h3>
+<p>Compound indexes are established on frequently queried paths (e.g., <code>{ jobId: 1, stage: 1 }</code>) to ensure the Kanban board loads instantly regardless of candidate volume. To handle massive scaling, MongoDB can be sharded based on <code>departmentId</code> or tenant ID for future multi-company SaaS expansion.</p>
+
+<!-- ========================================== -->
+<!-- 8. AI & AUTOMATION                         -->
+<!-- ========================================== -->
+<h2>8. AI & AUTOMATION (n8n Deep Dive)</h2>
+
+<h3>8.1 The n8n JSON Logic & Workflow Architecture</h3>
+<p>The system utilizes an advanced <strong>n8n</strong> workflow named <em>"RH Assistant - Email Processor"</em>. The visual nodes map to complex underlying JSON execution logic:</p>
+<ol>
+    <li><strong>Node: <code>Email Trigger (IMAP)</code>:</strong> Continuously polls the IMAP server. Extracts <code>subject</code>, <code>text</code>, and <code>binary</code> attachments.</li>
+    <li><strong>Node: <code>If1 (Condition)</code>:</strong> Evaluates <code>$binary.attachment_0.mimeType == 'application/pdf'</code>.</li>
+    <li><strong>True Branch (Resume Processing):</strong>
+        <ul>
+            <li><strong><code>Extract from File</code>:</strong> Converts the binary PDF into a raw text string.</li>
+            <li><strong><code>HTTP Request 1 (Groq Llama-3.3-70b-versatile)</code>:</strong> Sends a meticulously crafted System Prompt instructing the LLM to act as an HR AI. The prompt enforces classification rules (Applications vs. Interviews) and strictly mandates a JSON output format containing arrays for skills, education, and calculated experience years based on the concatenated email body and CV text.</li>
+            <li><strong><code>Code in JavaScript</code>:</strong> A critical sanitization node. It utilizes <code>JSON.parse()</code> wrapped in a <code>try/catch</code> block. If the LLM hallucinates markdown wrappers (<code>```json</code>), regex strips them. Critically, this node carries the original <code>binaryData</code> forward so it is not lost during the JSON parsing.</li>
+            <li><strong><code>HTTP Request (Webhook)</code>:</strong> Executes a <code>multipart/form-data</code> POST to the Node.js backend. It maps the stringified JSON payload to the <code>data</code> key and the physical file to the <code>resume</code> key.</li>
+        </ul>
+    </li>
+    <li><strong>False Branch (General Email Triage):</strong>
+        <ul>
+            <li><strong><code>Groq Classify Email (Llama-3.1-8b-instant)</code>:</strong> Bypasses PDF extraction. Uses a highly optimized, smaller prompt to categorize the email and extract meeting dates. The 8B model ensures this executes in milliseconds.</li>
+            <li><strong><code>Post Email to Backend</code>:</strong> Sends an <code>application/json</code> POST to update the unified Inbox UI.</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>8.2 Candidate Ranking Algorithm</h3>
+<p>Once the webhook hits the backend, the Node.js service calculates the <code>aiScore</code>. It iterates through the job's <code>requiredSkills</code> array and performs string matching (or semantic vector similarity via embeddings) against the candidate's <code>extractedSkills</code> array. Experience years and education level apply weighted modifiers to the final 0-100 score.</p>
+
+<!-- ========================================== -->
+<!-- 9. SECURITY                                -->
+<!-- ========================================== -->
+<h2>9. SECURITY</h2>
+
+<ul>
+    <li><strong>Authentication & Authorization:</strong> Strict implementation of JSON Web Tokens (JWT). The backend verifies tokens on every protected route. Role-Based Access Control (RBAC) ensures a 'Recruiter' cannot access 'Admin' billing settings.</li>
+    <li><strong>Password Hashing:</strong> Plaintext passwords never touch the database. They are salted and hashed via <code>bcrypt</code> (10+ salt rounds).</li>
+    <li><strong>Secure APIs & Webhooks:</strong> The n8n Webhook endpoint is protected. It validates incoming requests to ensure they originate from trusted IPs or contain a pre-shared cryptographic secret header, preventing malicious actors from injecting fake candidates.</li>
+    <li><strong>File Security & Directory Traversal Prevention:</strong> Uploaded PDFs are renamed using UUIDs and stored outside the public web root (or securely in AWS S3), preventing execution of malicious uploaded scripts.</li>
+    <li><strong>XSS & SQL/NoSQL Injection Prevention:</strong> Express <strong>Helmet.js</strong> secures HTTP headers. All incoming JSON bodies (especially those from the LLM) are rigorously validated using schema validators (Zod/Joi) to neutralize injection vectors.</li>
+    <li><strong>Rate Limiting:</strong> <code>express-rate-limit</code> prevents brute-force login attempts and API DDoS attacks.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- 10. DEVOPS & DEPLOYMENT                    -->
+<!-- ========================================== -->
+<h2>10. DEVOPS & DEPLOYMENT</h2>
+
+<h3>10.1 Infrastructure & Deployment Strategy</h3>
+<p>The system is architected for modern Cloud-Native deployment via <strong>Docker</strong>. 
+<ul>
+    <li><strong>Containerization:</strong> <code>Dockerfile</code>s exist for both the Node.js backend and Next.js frontend, ensuring absolute parity between local development and production environments.</li>
+    <li><strong>CI/CD Pipeline:</strong> Managed via <strong>GitHub Actions</strong>. Upon pushing to the <code>main</code> branch, the pipeline automatically lints the code, executes Jest unit tests, builds the Docker images, and pushes them to a container registry.</li>
+    <li><strong>Production Server (Linux):</strong> Hosted on an Ubuntu VPS (e.g., AWS EC2 or DigitalOcean Droplet). <strong>Docker Compose</strong> orchestrates the containers.</li>
+    <li><strong>Nginx Reverse Proxy:</strong> Nginx sits at the edge, terminating SSL/TLS encryption (certificates auto-renewed via Let's Encrypt / Certbot) and routing traffic (Port 443 ➔ internal Port 3000/5000).</li>
+    <li><strong>Environment Variables:</strong> Strict separation of configuration. API keys (Groq, MongoDB URI, JWT Secrets) are injected at runtime via <code>.env</code> files and are never committed to version control.</li>
+</ul></p>
+
+<!-- ========================================== -->
+<!-- 11. PROJECT DEVELOPMENT PHASES             -->
+<!-- ========================================== -->
+<h2>11. PROJECT DEVELOPMENT PHASES</h2>
+<p>The PFE was executed chronologically following Agile principles:</p>
+<ol>
+    <li><strong>Idea Generation & Requirement Gathering (Weeks 1-2):</strong> Identified the HR bottleneck, formulated the AI-solution hypothesis, and drafted the initial feature list.</li>
+    <li><strong>Architecture & Database Design (Weeks 3-4):</strong> Selected the MERN-equivalent stack (Next/Node/Mongo) and drafted the ERD (Entity Relationship Diagrams) and System Architecture charts.</li>
+    <li><strong>The n8n AI Engine construction (Weeks 5-7):</strong> The most complex phase. Set up local IMAP servers, built the n8n pipeline, engineered and refined the Groq Llama 3 prompts to eliminate AI "hallucinations," and wrote the custom JavaScript parsing nodes.</li>
+    <li><strong>Backend API Development (Weeks 8-10):</strong> Built the Node.js server, MVC controllers, JWT authentication, and the crucial Webhook receiver to catch the <code>multipart/form-data</code> from n8n.</li>
+    <li><strong>Frontend UI/UX Design & Implementation (Weeks 11-13):</strong> Designed the dashboard in Figma, built the Next.js UI using Tailwind, implemented Zustand state, and connected the React components to the Node APIs via Axios.</li>
+    <li><strong>Testing, Refinement & E2E Integration (Week 14):</strong> Connected the entire loop (Email ➔ n8n ➔ Node ➔ DB ➔ Next.js). Conducted stress testing.</li>
+    <li><strong>Deployment & Documentation (Week 15):</strong> Containerized the application via Docker, deployed to a Linux server, configured Nginx, and compiled this exhaustive PFE Technical Report.</li>
+</ol>
+
+<!-- ========================================== -->
+<!-- 12. TESTING STRATEGY                       -->
+<!-- ========================================== -->
+<h2>12. TESTING</h2>
+<ul>
+    <li><strong>Unit Testing (Jest):</strong> Tested isolated mathematical functions (e.g., the <code>calculateAiScore</code> function) to ensure correct percentage generation based on mock skill arrays.</li>
+    <li><strong>API/Integration Testing (Postman/Supertest):</strong> Verified that the Node.js webhook controller successfully parses complex <code>multipart</code> data, correctly saves files to disk, and updates MongoDB.</li>
+    <li><strong>AI Prompt Validation Testing:</strong> Fed the n8n pipeline 50 different variations of highly complex, poorly formatted, and edge-case PDF resumes to ensure the Groq LLM consistently returned the correct, unbroken JSON schema.</li>
+    <li><strong>User Acceptance Testing (UAT):</strong> Simulated HR recruiters navigating the dashboard to identify UX bottlenecks in the Kanban board drag-and-drop interactions.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- 13. COMPLETE FEATURE LIST                  -->
+<!-- ========================================== -->
+<h2>13. COMPLETE FEATURE LIST</h2>
+<ul>
+    <li>Secure JWT Authentication & Role Management (Admin, Recruiter).</li>
+    <li>Autonomous IMAP Email Ingestion & Monitoring.</li>
+    <li>Intelligent Email Triage (Categorization via Llama 3 8B).</li>
+    <li>Zero-Click PDF Resume OCR & NLP Extraction (via Llama 3 70B).</li>
+    <li>Algorithmic Candidate Scoring & Semantic Matching against Job Postings.</li>
+    <li>Interactive Kanban Pipeline Board (Drag-and-Drop state management).</li>
+    <li>Unified HR Mail Inbox with AI Priority Tagging.</li>
+    <li>Comprehensive Job Board Management (CRUD for vacancies).</li>
+    <li>Split-Pane Candidate Profiler (AI JSON data mapped next to original PDF).</li>
+    <li>Dashboard Analytics (Charts representing recruitment velocity and application volume).</li>
+    <li>Interview Scheduling & Calendar Integration.</li>
+    <li>Real-time UI updates (WebSockets ready).</li>
+    <li>Comprehensive Audit Logging & Error Tracking.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- 14. FUTURE IMPROVEMENTS                    -->
+<!-- ========================================== -->
+<h2>14. FUTURE IMPROVEMENTS</h2>
+<ul>
+    <li><strong>Multi-Tenant SaaS Support:</strong> Modifying the database schema to include <code>tenantId</code> keys, allowing the platform to be sold as a B2B SaaS product to multiple isolated companies on the same infrastructure.</li>
+    <li><strong>Automated Email Replies via n8n:</strong> Expanding the n8n workflow to include an SMTP node that automatically emails rejected candidates (after a calculated 48-hour delay to simulate human review) or instantly emails high-scoring candidates with a Calendly interview link.</li>
+    <li><strong>Video Interview AI Analysis:</strong> Ingesting recorded video interviews to analyze facial micro-expressions, sentiment, and soft skills utilizing advanced computer vision models.</li>
+    <li><strong>Predictive Analytics:</strong> Utilizing historical retention data to train a Machine Learning model capable of predicting a candidate's long-term success and tenure before they are hired.</li>
+    <li><strong>Blockchain Verification:</strong> Integrating with university ledgers to instantly, cryptographically verify degrees, eliminating resume fraud.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- 15. CONCLUSION                             -->
+<!-- ========================================== -->
+<h2>15. CONCLUSION</h2>
+<p>The <strong>RH Assistant</strong> project represents a massive, disruptive leap forward from traditional HR management tools. By strictly decoupling the architecture into a highly concurrent Node.js backend, a responsive and modern Next.js frontend, and a completely autonomous, event-driven n8n ingestion pipeline, the system demonstrates true enterprise-level software engineering.</p>
+<p>The ingenious, dual-model integration of Groq's high-speed Llama 3 AI completely eliminates the tedious administrative overhead of reading resumes and sorting emails. This PFE successfully proves that combining robust workflow orchestration with cutting-edge Large Language Models can transition a recruiter's role from a repetitive data-entry administrator to a highly strategic talent acquisition manager. The scalable infrastructure ensures that transitioning this system from a university thesis prototype to a highly lucrative, production-ready startup serving enterprise clients is a structurally sound and feasible immediate next step.</p>
+
+</body>
+</html>

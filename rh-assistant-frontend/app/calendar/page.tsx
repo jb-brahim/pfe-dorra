@@ -360,15 +360,7 @@ export default function CalendarPage() {
              </div>
            </Card>
 
-           {/* Sync Call card */}
-           <Card className="p-6 rounded-[32px] border-none shadow-lg bg-indigo-600 text-white flex flex-col items-center text-center">
-              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-md">
-                <Video className="w-6 h-6" />
-              </div>
-              <h4 className="text-base font-black mb-1">Google Calendar Sync</h4>
-              <p className="text-[11px] font-semibold text-indigo-100 mb-5 leading-relaxed">Connect your Google account to dynamically lock and sync slots.</p>
-              <Button className="w-full rounded-2xl bg-white text-indigo-600 h-11 font-black hover:bg-indigo-50 shadow-md">Connect Account</Button>
-           </Card>
+
         </div>
 
       </div>

@@ -1,0 +1,293 @@
+{
+  "name": "RH Assistant - Email Processor",
+  "nodes": [
+    {
+      "parameters": {
+        "format": "resolved",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        96
+      ],
+      "id": "866d9bf9-995b-43a0-911a-83d95b764aca",
+      "name": "Email Trigger (IMAP)",
+      "credentials": {
+        "imap": {
+          "id": "sJe7Z1bpsUGca3Mj",
+          "name": "IMAP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        -32
+      ],
+      "id": "7ba136bf-acbe-4963-b0af-9ee0a0ef2adb",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI response from the HTTP Request node\nconst aiResponse = items[0].json.choices[0].message.content;\n\n// Parse the JSON from the AI's response\nlet parsed;\ntry {\n  parsed = JSON.parse(aiResponse);\n} catch (e) {\n  const cleaned = aiResponse.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  parsed = JSON.parse(cleaned);\n}\n\n// Get original email data from the trigger node\nconst emailNode = $('Email Trigger (IMAP)').first();\nconst emailData = emailNode.json;\n\n// --- THIS IS THE FIX ---\n// Carry the binary file forward so the next node can see it\nconst binaryData = emailNode.binary;\n\nreturn [{\n  json: {\n    senderName: parsed.senderName || emailData.from.value[0].name || '',\n    senderEmail: emailData.from.value[0].address,\n    subject: emailData.subject,\n    body: emailData.text,\n    category: parsed.category,\n    priority: parsed.priority || 'Normal',\n    fullName: parsed.fullName,\n    phone: parsed.phone,\n    summary: parsed.summary,\n    extractedSkills: parsed.extractedSkills || [],\n    education: parsed.education,\n    experienceYears: parsed.experienceYears || 0,\n    certifications: parsed.certifications || [],\n    languages: parsed.languages || [],\n    portfolioLinks: parsed.portfolioLinks || [],\n    recommendationLevel: parsed.recommendationLevel,\n    jobId: \"\" \n  },\n  binary: binaryData // This passes the CV file to the final HTTP node\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -80
+      ],
+      "id": "c3bb439d-5547-4852-a780-36cad0994db6",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://unsupervised-filamented-eartha.ngrok-free.dev/api/webhooks/incoming-email",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ JSON.stringify($json) }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "resume",
+              "inputDataFieldName": "attachment_0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        784,
+        -64
+      ],
+      "id": "806d9d9f-84a5-4772-ac1f-4cbd2a625d46",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpMultipleHeadersAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  \"model\": \"llama-3.3-70b-versatile\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a professional HR Assistant AI. Your task is to analyze the email and CV. \\n\\nCLASSIFICATION RULES:\\n1. If the email is a job application (CV attached), set category to 'Applications'.\\n2. If the email is about scheduling or confirming an interview, set category to 'Job Interview'.\\n3. If it is an urgent or important email from management, set category to 'Important'.\\n4. For everything else, use 'Others'.\\n\\nPRIORITY RULES:\\n- High: Direct applications, interview confirmations.\\n- Medium: Follow-ups, general inquiries.\\n- Low: Newsletters, notifications.\\n\\nYou MUST return a valid JSON object with: senderName, category, priority, fullName, phone, summary, extractedSkills, education, experienceYears, certifications, languages, portfolioLinks, recommendationLevel.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Email Subject: \" + $node[\"Email Trigger (IMAP)\"].json.subject + \n                 \"\\nEmail Body: \" + $node[\"Email Trigger (IMAP)\"].json.text + \n                 \"\\nCV Text: \" + $node[\"Extract from File\"].json.text\n    }\n  ],\n  \"response_format\": { \"type\": \"json_object\" }\n})\n}}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        -80
+      ],
+      "id": "b9c79425-b21f-493f-9422-8cdf47396877",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpMultipleHeadersAuth": {
+          "id": "ZX3OfziU5rwHSIVV",
+          "name": "Multiple Headers Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "77aaa229-fd14-4d81-ae28-dd43d297c2e6",
+              "leftValue": "={{ $binary.attachment_0 ? $binary.attachment_0.mimeType : '' }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        96
+      ],
+      "id": "f10e1d37-990f-49ab-a11e-a8528a922c37",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_GROQ_API_KEY_HERE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "=application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n    \"model\": \"llama-3.1-8b-instant\",\n    \"messages\": [\n      {\n        \"role\": \"system\",\n        \"content\": \"You are an HR AI Assistant. Classify the email into: 'Important', 'Job Interview', 'Meeting', or 'Others'. Priority: 'High', 'Medium', or 'Low'. If the email mentions scheduling a meeting, extract the date (YYYY-MM-DD format based on today), time (HH:MM), and a short title. Respond ONLY in JSON: { \\\"category\\\": \\\"CategoryName\\\", \\\"summary\\\": \\\"Short summary\\\", \\\"priority\\\": \\\"High\\\", \\\"meetingDate\\\": \\\"YYYY-MM-DD or null\\\", \\\"meetingTime\\\": \\\"HH:MM or null\\\", \\\"meetingTitle\\\": \\\"Title or null\\\" }\"\n      },\n      {\n        \"role\": \"user\",\n        \"content\": \"Subject: \" + $json.subject + \"\\nFrom: \" + ($json.from && $json.from.text ? $json.from.text : \"\") + \"\\nDate Sent: \" + ($json.date ? $json.date : \"Today\") + \"\\nBody: \" + $json.text\n      }\n    ]\n  }) \n}}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        272,
+        192
+      ],
+      "id": "776a0d40-1b0e-44b3-9949-25ef152b1ba0",
+      "name": "Groq Classify Email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://unsupervised-filamented-eartha.ngrok-free.dev/api/webhooks/incoming-email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "=application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  \"senderName\": $('Email Trigger (IMAP)').item.json.from ? $('Email Trigger (IMAP)').item.json.from.value[0].name : \"\",\n  \"senderEmail\": $('Email Trigger (IMAP)').item.json.from ? $('Email Trigger (IMAP)').item.json.from.value[0].address : \"\",\n  \"subject\": $('Email Trigger (IMAP)').item.json.subject,\n  \"body\": $('Email Trigger (IMAP)').item.json.text,\n  \"category\": JSON.parse($json.choices[0].message.content).category,\n  \"priority\": JSON.parse($json.choices[0].message.content).priority,\n  \"meetingDate\": JSON.parse($json.choices[0].message.content).meetingDate,\n  \"meetingTime\": JSON.parse($json.choices[0].message.content).meetingTime,\n  \"meetingTitle\": JSON.parse($json.choices[0].message.content).meetingTitle\n}) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        192
+      ],
+      "id": "d1f700fa-11d4-4002-9d64-351dae698580",
+      "name": "Post Email to Backend."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq Classify Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Classify Email": {
+      "main": [
+        [
+          {
+            "node": "Post Email to Backend.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3887d7ca-f1af-4cf5-abbe-dab33554c867",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "14d36379f6ef1d386a5c24178179e3ce74ccbc407e62ec25210fe6f536c84a86"
+  },
+  "id": "SJLOggMMOjhHEGNk",
+  "tags": []
+}

@@ -91,14 +91,6 @@ export default function DashboardPage() {
           <p className="text-slate-500 font-medium">Welcome back! Here is your recruitment overview for today.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex -space-x-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden shadow-sm">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user_${i}`} alt="avatar" />
-              </div>
-            ))}
-            <div className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-primary flex items-center justify-center text-white text-xs font-bold shadow-sm">+12</div>
-          </div>
           <Link href="/jobs">
             <Button className="rounded-2xl bg-primary hover:bg-primary/90 text-white px-6 font-bold gap-2 h-11 transition-all duration-300 shadow-md shadow-primary/20 hover:scale-105">
               <Sparkles className="w-4 h-4" /> New Job Post
@@ -318,8 +310,8 @@ export default function DashboardPage() {
                   <tr key={candidate._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-850/20 transition-all duration-300">
                     <td className="py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-slate-100 overflow-hidden shrink-0 shadow-sm border border-white">
-                          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${candidate.personalInfo?.fullName}`} alt="Avatar" />
+                        <div className="w-9 h-9 rounded-full bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0 font-black text-sm">
+                          {candidate.personalInfo?.fullName?.[0] || '?'}
                         </div>
                         <span className="font-extrabold text-sm text-slate-800 dark:text-slate-100">{candidate.personalInfo?.fullName}</span>
                       </div>
@@ -400,11 +392,13 @@ export default function DashboardPage() {
                       ],
                       borderWidth: 0,
                       hoverOffset: 4,
-                      cutout: '75%',
                     }
                   ]
                 }} 
-                options={chartOptions} 
+                options={{
+                  ...chartOptions,
+                  cutout: '75%',
+                }} 
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <p className="text-3xl font-black text-slate-900 dark:text-white leading-none">{pipeline.total}</p>

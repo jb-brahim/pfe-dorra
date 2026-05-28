@@ -1,0 +1,67 @@
+classDiagram
+    direction TB
+
+    class User {
+        +ObjectId id
+        +String name
+        +String email
+        +String password
+        +String role
+        +Date createdAt
+    }
+
+    class JobPosting {
+        +ObjectId id
+        +String title
+        +String description
+        +String location
+        +String type
+        +String department
+        +String experience
+        +String priority
+        +String status
+        +Date createdAt
+    }
+
+    class Candidate {
+        +ObjectId id
+        +String personalInfo_fullName
+        +String personalInfo_email
+        +String personalInfo_phone
+        +Object aiAnalysis
+        +Number matchScore
+        +String status
+        +String cvUrl
+        +String notes
+        +Array workExperience
+        +Date createdAt
+    }
+
+    class Event {
+        +ObjectId id
+        +String title
+        +String description
+        +String type
+        +Date date
+        +Array attendees
+        +String status
+        +Date createdAt
+    }
+
+    class Email {
+        +ObjectId id
+        +String senderName
+        +String senderEmail
+        +String subject
+        +String body
+        +String category
+        +String priority
+        +Boolean isRead
+        +Date createdAt
+    }
+
+    User "1" -- "*" JobPosting : creates
+    JobPosting "1" -- "*" Candidate : receives applications
+    User "1" -- "*" Event : organizes
+    Candidate "1" -- "*" Event : attends
+    Candidate "1" -- "*" Email : linked to

@@ -500,7 +500,7 @@ export default function MailsPage() {
                         className="rounded-xl" 
                         onClick={() => {
                           if (selectedEmail.cvUrl) {
-                            window.open(`http://localhost:5000${selectedEmail.cvUrl}`, '_blank');
+                            window.open(`https://pfe-dorra.onrender.com${selectedEmail.cvUrl}`, '_blank');
                           }
                         }}
                       >
@@ -512,7 +512,7 @@ export default function MailsPage() {
                         className="rounded-xl" 
                         onClick={() => {
                           if (selectedEmail.cvUrl) {
-                            window.open(`http://localhost:5000${selectedEmail.cvUrl}`, '_blank');
+                            window.open(`https://pfe-dorra.onrender.com${selectedEmail.cvUrl}`, '_blank');
                           }
                         }}
                       >
@@ -530,7 +530,7 @@ export default function MailsPage() {
                         <Sparkles className="w-4 h-4 text-primary fill-primary/20" />
                         AI Extracted Information
                       </h4>
-                      <Button variant="link" className="text-xs font-bold text-primary" onClick={() => console.log(selectedEmail.candidateId.aiAnalysis)}>Show Raw Data</Button>
+                      <Button variant="link" className="text-xs font-bold text-primary" onClick={() => alert(JSON.stringify(selectedEmail.candidateId.aiAnalysis, null, 2))}>Show Raw Data</Button>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
@@ -647,7 +647,7 @@ export default function MailsPage() {
                           onClick={() => handleCandidateStatus(selectedEmail.candidateId?._id, 'Interviewing')}
                           disabled={!selectedEmail.candidateId || selectedEmail.candidateId.status === 'Interviewing'}
                         >
-                          <UserPlus className="w-4 h-4" /> {selectedEmail.candidateId?.status === 'Interviewing' ? 'Added to Interviews' : 'Add to Candidates'}
+                          <Calendar className="w-4 h-4" /> {selectedEmail.candidateId?.status === 'Interviewing' ? 'Interview Scheduled' : 'Schedule Interview'}
                         </Button>
                         <Link href="/candidates" className="flex-1">
                           <Button variant="outline" className="w-full border-slate-200 rounded-2xl h-12 font-bold gap-2 text-slate-600">

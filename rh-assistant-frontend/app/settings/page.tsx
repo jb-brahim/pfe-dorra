@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings, Mail, Shield, Sparkles, Cpu, Sliders, 
   Layers, Key, Check, Save, Copy, RefreshCw, 
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { api } from '@/lib/api';
 
 type TabType = 'email' | 'ai' | 'smtp' | 'profile';
 
@@ -17,13 +18,14 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('email');
   const [isSaving, setIsSaving] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // States
   const [profileData, setProfileData] = useState({
-    fullName: 'Dorra Tagougi',
-    title: 'HR Manager',
-    company: 'SOSOB Construction Company',
-    website: 'https://sosob-construction.com'
+    fullName: '',
+    title: '',
+    company: '',
+    website: ''
   });
 
   const [aiWeights, setAiWeights] = useState({
@@ -35,29 +37,66 @@ export default function SettingsPage() {
   const [aiEngine, setAiEngine] = useState('groq-llama-70b');
 
   const [smtpData, setSmtpData] = useState({
-    user: 'brahimjaballi0@gmail.com',
-    pass: 'dhbaxvrexlnfqjxd',
-    host: 'smtp.gmail.com',
-    port: '465'
+    user: '',
+    pass: '',
+    host: '',
+    port: ''
   });
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await api.get('/settings');
+        if (data) {
+          if (data.profileData) setProfileData(data.profileData);
+          if (data.aiWeights) setAiWeights(data.aiWeights);
+          if (data.aiEngine) setAiEngine(data.aiEngine);
+          if (data.smtpData) setSmtpData(data.smtpData);
+        }
+      } catch (err) {
+        console.error('Error loading settings:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadSettings();
+  }, []);
+
   const handleCopyBridgeEmail = () => {
-    navigator.clipboard.writeText('brahimjaballi0+assistant@gmail.com');
+    const bridgeEmail = smtpData.user ? `${smtpData.user.split('@')[0]}+assistant@${smtpData.user.split('@')[1]}` : '';
+    if (!bridgeEmail) {
+      alert('Please configure your SMTP email first.');
+      return;
+    }
+    navigator.clipboard.writeText(bridgeEmail);
     alert('📋 Bridge Email Address copied to clipboard!');
   };
 
   const handleSaveSettings = async () => {
     try {
       setIsSaving(true);
-      // Simulate API Save
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await api.put('/settings', {
+        profileData,
+        aiWeights,
+        aiEngine,
+        smtpData
+      });
       alert('💾 All system preferences successfully saved and integrated with MongoDB Atlas!');
     } catch (err) {
       console.error(err);
+      alert('Failed to save settings.');
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[500px]">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-slate-50/30 dark:bg-slate-950 p-8 gap-8 overflow-y-auto">
@@ -138,7 +177,13 @@ export default function SettingsPage() {
               <div className="bg-indigo-500/5 p-5 rounded-2xl border border-indigo-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex flex-col gap-1.5">
                   <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest leading-none">Your Allocated Inbound Assistant Mail</p>
-                  <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200">brahimjaballi0+assistant@gmail.com</p>
+                  {smtpData.user ? (
+                    <p className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                      {`${smtpData.user.split('@')[0]}+assistant@${smtpData.user.split('@')[1]}`}
+                    </p>
+                  ) : (
+                    <p className="text-sm font-semibold text-slate-400 italic">Configure your SMTP email in the SMTP tab first</p>
+                  )}
                 </div>
                 <Button 
                   onClick={handleCopyBridgeEmail}
@@ -160,7 +205,7 @@ export default function SettingsPage() {
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 flex flex-col gap-2">
                     <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm">2</div>
                     <h5 className="font-extrabold text-xs text-slate-900">Configure Filter</h5>
-                    <p className="text-[11px] font-semibold text-slate-400 leading-relaxed">Add rule: "Forward any incoming email with attachments to: brahimjaballi0+assistant@gmail.com".</p>
+                    <p className="text-[11px] font-semibold text-slate-400 leading-relaxed">Add rule: "Forward any incoming email with attachments to your bridge address above".</p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100/50 flex flex-col gap-2">
                     <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm">3</div>

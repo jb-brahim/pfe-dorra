@@ -25,6 +25,10 @@ export default function CandidateDetailsPage() {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isFavorite, setIsFavorite] = useState(false);
   
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ fullName: '', email: '', phone: '' });
+  
   // Interactive Notes State
   const [notesList, setNotesList] = useState<string[]>([
     "Strong technical aptitude shown during early screening.",
@@ -55,6 +59,18 @@ export default function CandidateDetailsPage() {
       alert(`Status updated to ${status}!`);
     } catch (err) {
       console.error('Error updating status:', err);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const updated = await api.put(`/candidates/${id}`, { personalInfo: editForm });
+      setCandidate(updated);
+      setIsEditModalOpen(false);
+      alert('Candidate details updated successfully!');
+    } catch (err) {
+      console.error('Error updating candidate:', err);
+      alert('Failed to update candidate.');
     }
   };
 
@@ -121,6 +137,48 @@ export default function CandidateDetailsPage() {
 
   return (
     <div className="flex flex-col h-full bg-[#fafbfc] dark:bg-slate-950 p-8 gap-6 overflow-y-auto custom-scrollbar">
+      {/* Edit Candidate Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 max-w-md w-full shadow-2xl border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-2xl font-black mb-6">Edit Candidate Info</h3>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Full Name</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                  value={editForm.fullName}
+                  onChange={(e) => setEditForm({...editForm, fullName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Email</label>
+                <input 
+                  type="email" 
+                  className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Phone Number</label>
+                <input 
+                  type="text" 
+                  className="w-full p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 font-bold focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button variant="ghost" className="flex-1 rounded-2xl h-12 font-bold" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
+              <Button className="flex-1 rounded-2xl h-12 font-bold bg-primary hover:bg-primary/90 text-white" onClick={handleSaveEdit}>Save Changes</Button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Recruiter Top Navigation Link */}
       <div className="flex items-center justify-between">
         <Button 
@@ -132,12 +190,20 @@ export default function CandidateDetailsPage() {
           Back to Candidates
         </Button>
         <div className="flex gap-3">
-          <Button variant="outline" className="rounded-2xl border-slate-200 hover:bg-slate-50 font-bold h-11 px-5 text-sm flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="rounded-2xl border-slate-200 hover:bg-slate-50 font-bold h-11 px-5 text-sm flex items-center gap-2"
+            onClick={() => {
+              setEditForm({
+                fullName: candidate?.personalInfo?.fullName || '',
+                email: candidate?.personalInfo?.email || '',
+                phone: candidate?.personalInfo?.phone || ''
+              });
+              setIsEditModalOpen(true);
+            }}
+          >
             <Edit className="w-4 h-4 text-slate-500" />
             Edit Candidate
-          </Button>
-          <Button variant="outline" className="rounded-2xl border-slate-200 hover:bg-slate-50 font-bold h-11 px-4 text-sm">
-            More Actions <span className="text-slate-400 ml-1">▼</span>
           </Button>
         </div>
       </div>
@@ -440,13 +506,13 @@ export default function CandidateDetailsPage() {
                     <Button 
                       variant="outline" 
                       className="rounded-xl font-bold h-10 px-4 text-sm"
-                      onClick={() => window.open(`http://localhost:5000${resumeUrl}`, '_blank')}
+                      onClick={() => window.open(`https://pfe-dorra.onrender.com${resumeUrl}`, '_blank')}
                     >
                       <Download className="w-4 h-4 mr-2" /> Download File
                     </Button>
                   </div>
                   <div className="w-full h-[600px] rounded-2xl overflow-hidden border border-slate-200">
-                    <iframe src={`http://localhost:5000${resumeUrl}`} className="w-full h-full" />
+                    <iframe src={`https://pfe-dorra.onrender.com${resumeUrl}`} className="w-full h-full" />
                   </div>
                 </div>
               ) : (
@@ -615,7 +681,7 @@ export default function CandidateDetailsPage() {
               <div className="flex gap-1.5 shrink-0 ml-3">
                 <button 
                   onClick={() => {
-                    if (resumeUrl) window.open(`http://localhost:5000${resumeUrl}`, '_blank');
+                    if (resumeUrl) window.open(`https://pfe-dorra.onrender.com${resumeUrl}`, '_blank');
                     else alert('No Resume Link Attached!');
                   }}
                   className="p-2 bg-white rounded-xl hover:bg-slate-100 border border-slate-100 shadow-sm transition-all"
@@ -624,7 +690,7 @@ export default function CandidateDetailsPage() {
                 </button>
                 <button 
                   onClick={() => {
-                    if (resumeUrl) window.open(`http://localhost:5000${resumeUrl}`, '_blank');
+                    if (resumeUrl) window.open(`https://pfe-dorra.onrender.com${resumeUrl}`, '_blank');
                     else alert('No Resume Link Attached!');
                   }}
                   className="p-2 bg-white rounded-xl hover:bg-slate-100 border border-slate-100 shadow-sm transition-all"
@@ -648,7 +714,7 @@ export default function CandidateDetailsPage() {
                 Schedule Interview
               </Button>
               <Button 
-                onClick={() => alert("Quick reply draft generation triggers from inbox!")}
+                onClick={() => router.push('/email-templates')}
                 variant="outline" 
                 className="rounded-2xl border-slate-200 hover:bg-slate-50 h-16 flex flex-col gap-1.5 font-bold text-xs text-slate-600 justify-center items-center"
               >

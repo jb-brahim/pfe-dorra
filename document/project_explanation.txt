@@ -1,0 +1,61 @@
+RH ASSISTANT PROJECT - NON-TECHNICAL EXPLANATION
+
+OVERVIEW
+This project is an AI-powered HR Assistant designed to help recruiters manage job applications automatically. It acts like a digital recruitment agency that receives resumes, reads them, ranks candidates based on their skills, and provides a beautiful dashboard for the recruiter to manage everything.
+
+The project is split into two main parts:
+1. THE BACKEND (The Brain): Handles all the calculations, data storage, and "thinking".
+2. THE FRONTEND (The Face): The website interface that the recruiter interacts with.
+
+--------------------------------------------------------------------------------
+1. THE BACKEND (rh-assistant-backend)
+This is the "behind-the-scenes" office where all the work happens.
+
+- config: Contains the "Connection Settings". Specifically, it tells the Brain how to talk to the Database (the digital filing cabinet).
+- controllers: These are the "Department Managers". Each file manages a specific task:
+    * authController: Manages logins and security.
+    * candidateController: Manages candidate profiles.
+    * jobController: Manages job advertisements.
+    * webhookController: The "Receptionist" who receives new resumes from external tools (like n8n) and calculates their scores.
+- middleware: The "Security Guards". They check if a user is allowed to see certain information before letting them in.
+- models: The "Filing Templates". They define exactly what information we store for a Candidate, a Job, or an Email.
+- routes: The "Office Map". It directs incoming requests from the website to the correct Department Manager (Controller).
+- scripts: "Maintenance Tools". Small programs used to clean up the database or update records.
+- services: "Specialized Tasks". For example, a service specifically for sending out emails.
+- uploads: The "Storage Room". This is where the actual PDF files of the resumes are kept.
+- utils: The "Toolbox". Contains special tools like the "Resume Reader" that extracts text from PDF files.
+- server.js: The "Power Switch". This is the main file that starts the entire backend office.
+
+--------------------------------------------------------------------------------
+2. THE FRONTEND (rh-assistant-frontend)
+This is the beautiful website that the recruiter uses.
+
+- app (The Pages):
+    * dashboard: The "Home Screen". Shows a summary of everything (total candidates, recent emails, etc.).
+    * candidates: The "Candidate Directory". A list of everyone who applied, with search and filter options.
+    * [id] (inside candidates): The "Individual Profile". Detailed view of one specific candidate.
+    * calendar: The "Schedule". Shows upcoming interviews and events.
+    * interviews: A dedicated page to manage interview sessions.
+    * job-postings: The "Job Board". Where recruiters create and manage job offers.
+    * mails: The "Inbox". Shows emails received from candidates.
+    * reports: The "Statistics Page". Shows charts and data about recruitment performance.
+    * settings: The "Control Panel". Where the recruiter can change their profile or app preferences.
+- components: The "Building Blocks". Instead of rebuilding a button or a table every time, we create them once here and reuse them on every page.
+- hooks: "Custom Sensors". Special shortcuts that help the website react to changes (like window resizing or data loading).
+- lib: "The Library". Contains helper code, like the "Intercom" (api.ts) that the website uses to talk to the Backend.
+- public: The "Image Gallery". Stores logos, icons, and static images used on the site.
+- styles: The "Decoration Kit". Contains the CSS files that define the colors, fonts, and layout of the website.
+
+--------------------------------------------------------------------------------
+3. DOCUMENTATION & OTHERS
+- document: Contains guides and images for the project.
+    * n8n_setup_guide.md: Instructions on how to set up the email automation.
+    * project_documentation.md: The full technical manual.
+- uml_diagram.png: A visual map showing how all parts of the Brain are connected.
+
+SUMMARY OF HOW IT WORKS:
+1. A candidate sends an email with a resume.
+2. The "Receptionist" (Webhook) in the Backend receives it.
+3. The "Toolbox" (Resume Parser) reads the resume.
+4. The "Department Manager" (Controller) calculates a score and saves it in the "Filing Cabinet" (Database).
+5. The Recruiter logs into the "Face" (Frontend) and sees the candidate at the top of their list!

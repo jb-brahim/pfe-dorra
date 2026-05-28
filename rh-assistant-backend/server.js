@@ -24,6 +24,7 @@ const webhookRoutes = require('./routes/webhookRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const settingsRoutes = require('./routes/settingsRoutes');
 
 // Mount routers
 app.use('/api/auth', authRoutes);
@@ -33,6 +34,7 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/emails', emailRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/', (req, res) => {
   res.send('RH Assistant API is running...');

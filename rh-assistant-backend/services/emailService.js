@@ -1,15 +1,38 @@
-// This is a stub service for sending automated emails.
-// In a real app, you would use Nodemailer, SendGrid, or trigger another n8n webhook.
+const nodemailer = require('nodemailer');
 
+// We use Ethereal as a testing SMTP service since real credentials aren't provided.
+// Ethereal automatically catches emails so we can test without spamming real addresses.
 const sendEmail = async ({ to, subject, body }) => {
-  console.log('--------------------------------------------------');
-  console.log(`Sending Email to: ${to}`);
-  console.log(`Subject: ${subject}`);
-  console.log(`Body: \n${body}`);
-  console.log('--------------------------------------------------');
-  
-  // TODO: Implement actual email sending logic here (e.g., Nodemailer)
-  return true;
+  try {
+    const testAccount = await nodemailer.createTestAccount();
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: '"RH Assistant" <noreply@rh-assistant.com>', // sender address
+      to: to, // list of receivers
+      subject: subject, // Subject line
+      text: body, // plain text body
+    });
+
+    console.log('--------------------------------------------------');
+    console.log(`Email Sent!`);
+    console.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+    console.log('--------------------------------------------------');
+
+    return true;
+  } catch (error) {
+    console.error('Failed to send email:', error);
+    return false;
+  }
 };
 
 exports.sendRejectionEmail = async (candidateEmail, candidateName, jobTitle) => {

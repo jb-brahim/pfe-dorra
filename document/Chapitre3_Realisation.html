@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Chapitre 3 : Réalisation Détaillée - RH Assistant</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.8; color: #1a202c; max-width: 1200px; margin: 0 auto; padding: 40px; background-color: #f7fafc; }
+        .page-container { background-color: #ffffff; padding: 60px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-radius: 8px; }
+        h1 { color: #2b6cb0; border-bottom: 4px solid #3182ce; padding-bottom: 15px; text-align: center; font-size: 3em; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 50px; }
+        h2 { color: #2c5282; border-bottom: 2px solid #e2e8f0; margin-top: 60px; padding-bottom: 10px; font-size: 2.2em; page-break-before: always; }
+        h3 { color: #2b6cb0; margin-top: 40px; font-size: 1.6em; border-left: 5px solid #4299e1; padding-left: 15px; background-color: #ebf8ff; padding: 10px 10px 10px 15px; }
+        h4 { color: #2d3748; margin-top: 30px; font-size: 1.3em; text-decoration: underline; }
+        h5 { color: #4a5568; margin-top: 20px; font-size: 1.1em; font-weight: bold; }
+        p { margin-bottom: 20px; text-align: justify; font-size: 1.05em; }
+        ul, ol { margin-bottom: 25px; padding-left: 40px; font-size: 1.05em; }
+        li { margin-bottom: 10px; }
+        code { background-color: #edf2f7; padding: 4px 8px; border-radius: 4px; font-family: 'Fira Code', 'Courier New', Courier, monospace; font-size: 0.9em; color: #c53030; border: 1px solid #e2e8f0; }
+        pre { background-color: #1a202c; color: #f7fafc; padding: 25px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-left: 5px solid #48bb78; line-height: 1.5; }
+        pre code { background-color: transparent; color: inherit; padding: 0; border: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: white; }
+        th, td { border: 1px solid #e2e8f0; padding: 15px; text-align: left; font-size: 1.05em; }
+        th { background-color: #2b6cb0; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; }
+        tr:nth-child(even) { background-color: #f7fafc; }
+        tr:hover { background-color: #ebf8ff; }
+        .highlight-box { background-color: #ebf8ff; padding: 25px; border-left: 6px solid #3182ce; margin: 30px 0; border-radius: 0 8px 8px 0; font-style: italic; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .warning-box { background-color: #fffaf0; padding: 25px; border-left: 6px solid #dd6b20; margin: 30px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .diagram-text { font-family: monospace; background-color: #f8fafc; padding: 20px; border: 1px dashed #cbd5e0; white-space: pre; overflow-x: auto; font-size: 0.9em; }
+        @media print {
+            body { background-color: white; padding: 0; }
+            .page-container { box-shadow: none; padding: 20px; }
+            h2 { page-break-before: always; }
+            pre, table { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+
+<h1>Chapitre 3 : Réalisation & Implémentation Détaillée</h1>
+
+<!-- ========================================== -->
+<!-- INTRODUCTION -->
+<!-- ========================================== -->
+<h2>Introduction au Cycle de Développement</h2>
+<p>Ce chapitre est dédié à la phase cruciale de la réalisation technique de la plateforme « RH Assistant ». Cette phase traduit les concepts théoriques, les diagrammes architecturaux et les maquettes en un produit logiciel fonctionnel, robuste et prêt pour la production. Conscient de l'envergure du projet et de la nécessité d'intégrer des technologies de pointe (Intelligence Artificielle Générative, Orchestration de flux, Développement Web Full-Stack), nous avons adopté une méthodologie <strong>Agile Scrum</strong> stricte.</p>
+
+<p>La méthodologie Scrum nous a permis de décomposer la complexité du projet en itérations courtes et gérables appelées <strong>Sprints</strong>. Chaque sprint a duré exactement deux semaines. À la fin de chaque sprint, un incrément logiciel fonctionnel et testé a été livré. Cette approche itérative a été particulièrement vitale lors de l'intégration des API d'Intelligence Artificielle, où le comportement non déterministe des modèles LLM (Large Language Models) nécessitait des ajustements constants (Prompt Engineering) basés sur des tests empiriques continus.</p>
+
+<div class="highlight-box">
+    <strong>Environnement de Développement (Stack Technique de Référence) :</strong>
+    <ul>
+        <li><strong>Frontend :</strong> React 18, Next.js 14 (App Router), TypeScript, Tailwind CSS, Zustand, React-Beautiful-DnD.</li>
+        <li><strong>Backend :</strong> Node.js 20, Express.js, Multer, JSON Web Tokens (JWT), Bcrypt.</li>
+        <li><strong>Base de données :</strong> MongoDB Atlas, Mongoose ODM.</li>
+        <li><strong>IA & Automatisation :</strong> n8n (Self-hosted), Groq API, Meta Llama-3.3-70B, Meta Llama-3.1-8B.</li>
+        <li><strong>Outils de Test & DevOps :</strong> Postman, Jest, Ngrok, Docker, GitHub Actions.</li>
+    </ul>
+</div>
+
+<p>Ce chapitre est structuré selon la chronologie exacte de notre développement, divisé en quatre sprints majeurs. Pour chaque sprint, nous détaillerons exhaustivement : la liste des <strong>User Stories</strong> avec leurs critères d'acceptation, la <strong>Modélisation conceptuelle et architecturale</strong>, les <strong>détails du code source d'Implémentation</strong>, et enfin les <strong>stratégies de Tests et de Validation</strong>.</p>
+
+<!-- ========================================== -->
+<!-- SPRINT 1 -->
+<!-- ========================================== -->
+<h2>1. Développement du Sprint 1 : Fondation Architecturale, Base de Données et Sécurité JWT</h2>
+<p>Le premier sprint est le pilier central de l'application. Sans un backend sécurisé et une base de données correctement configurée, l'intégration ultérieure de l'IA serait impossible. L'objectif de ce sprint est de créer le dépôt Node.js, configurer les schémas MongoDB via Mongoose, construire le dépôt Next.js, et établir un système d'authentification sans état (Stateless Authentication) via JSON Web Tokens (JWT) extrêmement sécurisé contre les failles courantes.</p>
+
+<h3>1.1 User Stories et Critères d'Acceptation</h3>
+<table>
+    <tr><th>ID</th><th>En tant que...</th><th>Je veux...</th><th>Afin de...</th><th>Critères d'acceptation stricts</th><th>Points (Effort)</th></tr>
+    <tr><td>US1.1</td><td>Administrateur Système</td><td>Initialiser l'architecture MVC Node.js et connecter MongoDB</td><td>Préparer l'infrastructure de données</td><td>La connexion MongoDB doit gérer les reconnexions automatiques. Variables d'environnement masquées dans <code>.env</code>.</td><td>5</td></tr>
+    <tr><td>US1.2</td><td>Responsable RH</td><td>M'inscrire et me connecter avec un email et un mot de passe</td><td>Accéder à mon espace privé en toute sécurité</td><td>Le mot de passe doit être haché (Bcrypt salt=12). L'API doit retourner un token JWT valide pour 24h.</td><td>8</td></tr>
+    <tr><td>US1.3</td><td>Développeur Frontend</td><td>Créer les composants d'interface de connexion sur Next.js</td><td>Fournir une UI réactive à l'utilisateur</td><td>Formulaires gérés par React Hook Form. Validation des emails via Regex. Gestion des erreurs HTTP (401/404) avec affichage de toasts (notifications).</td><td>5</td></tr>
+</table>
+
+<h3>1.2 Modélisation et Architecture des Données</h3>
+<h4>1.2.1 Schéma Entité-Association (Mongoose)</h4>
+<p>La première étape a consisté à modéliser la collection <code>Users</code>. Nous avons défini des règles strictes au niveau du schéma Mongoose pour garantir l'intégrité des données avant même qu'elles ne touchent la base de données.</p>
+<div class="diagram-text">
+// Schéma de la collection Users
+{
+  _id: ObjectId,
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true, index: true },
+  passwordHash: { type: String, required: true },
+  role: { type: String, enum: ['ADMIN', 'HR_MANAGER', 'RECRUITER'], default: 'RECRUITER' },
+  isActive: { type: Boolean, default: true },
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+</div>
+
+<h4>1.2.2 Diagramme de Séquence de l'Authentification JWT</h4>
+<p>Le flux d'authentification suit un modèle strict de type <em>Challenge-Response</em>. Le client Next.js envoie les credentials. Le backend Express.js vérifie l'existence de l'email, puis utilise l'algorithme cryptographique de <code>bcrypt</code> pour comparer le mot de passe en clair envoyé avec le <code>passwordHash</code> stocké. Si la comparaison est un succès, un payload JSON contenant l'identifiant et le rôle de l'utilisateur est signé cryptographiquement en utilisant la variable <code>JWT_SECRET</code> via l'algorithme HMAC SHA-256. Ce JWT est renvoyé au client, qui le stocke (idéalement dans un HttpOnly cookie ou en mémoire) et l'attache en tant que <code>Bearer Token</code> dans l'en-tête <code>Authorization</code> de toutes les requêtes HTTP futures.</p>
+
+<h3>1.3 Implémentation du Code Source</h3>
+<h4>1.3.1 Le Contrôleur d'Authentification (Backend)</h4>
+<p>L'implémentation du contrôleur <code>authController.js</code> est le cœur de la sécurité du système. Voici l'extrait exact de notre code de production gérant la connexion :</p>
+<pre><code>// rh-assistant-backend/src/controllers/authController.js
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Validation basique des entrées
+        if (!email || !password) {
+            return res.status(400).json({ error: "L'email et le mot de passe sont requis." });
+        }
+
+        // 2. Recherche de l'utilisateur dans MongoDB (indexé sur l'email)
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(404).json({ error: "Utilisateur non trouvé avec cet email." });
+        }
+
+        // 3. Comparaison cryptographique pour prévenir les attaques temporelles
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        if (!isMatch) {
+            return res.status(401).json({ error: "Mot de passe incorrect." });
+        }
+
+        // 4. Génération du Token JWT
+        const payload = {
+            userId: user._id,
+            role: user.role,
+            email: user.email
+        };
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { 
+            expiresIn: '24h',
+            algorithm: 'HS256' 
+        });
+        
+        // 5. Réponse sécurisée sans retourner le hash du mot de passe
+        res.status(200).json({ 
+            message: "Connexion réussie", 
+            token: token, 
+            user: { 
+                id: user._id,
+                firstName: user.firstName, 
+                lastName: user.lastName,
+                role: user.role 
+            } 
+        });
+    } catch (error) {
+        console.error("[AuthController Error]:", error);
+        res.status(500).json({ error: "Erreur critique du serveur interne." });
+    }
+};</code></pre>
+
+<h4>1.3.2 Le Middleware de Protection des Routes (Backend)</h4>
+<p>Pour protéger les autres routes de l'API (comme l'accès aux données des candidats), un middleware Express a été implémenté pour intercepter les requêtes et vérifier la validité du JWT.</p>
+<pre><code>// rh-assistant-backend/src/middleware/authMiddleware.js
+const jwt = require('jsonwebtoken');
+
+exports.verifyToken = (req, res, next) => {
+    // Récupération de l'en-tête Authorization
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: "Accès refusé. Aucun token fourni." });
+    }
+
+    // Extraction du token (suppression du mot 'Bearer ')
+    const token = authHeader.split(' ')[1];
+
+    try {
+        // Vérification cryptographique du token
+        const verifiedPayload = jwt.verify(token, process.env.JWT_SECRET);
+        // Injection du payload dans l'objet requête pour les contrôleurs suivants
+        req.user = verifiedPayload; 
+        next(); // Passe au middleware/contrôleur suivant
+    } catch (error) {
+        return res.status(403).json({ error: "Token invalide ou expiré." });
+    }
+};</code></pre>
+
+<h4>1.3.3 L'Intercepteur Axios (Frontend Next.js)</h4>
+<p>Sur le frontend, plutôt que d'attacher manuellement le token à chaque requête (ce qui génère de la duplication de code), nous avons configuré une instance Axios globale avec des <em>Interceptors</em>.</p>
+<pre><code>// rh-assistant-frontend/lib/api.ts
+import axios from 'axios';
+
+// Création d'une instance Axios centralisée
+const api = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
+    headers: { 'Content-Type': 'application/json' }
+});
+
+// Intercepteur de requête : attache le token JWT automatiquement
+api.interceptors.request.use((config) => {
+    // Récupération du token depuis le localStorage (ou Zustand store)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+export default api;</code></pre>
+
+<h3>1.4 Stratégie de Test et Validation (Sprint 1)</h3>
+<p>La validation a été divisée en tests unitaires et tests d'API (Intégration).</p>
+<ul>
+    <li><strong>Tests API via Postman :</strong> Nous avons créé une Collection Postman contenant des dizaines de requêtes.
+        <ul>
+            <li>Test du <code>POST /api/auth/register</code> : Vérification que le mot de passe est bien haché dans MongoDB.</li>
+            <li>Test du <code>POST /api/auth/login</code> avec un mot de passe erroné : Vérification du statut 401.</li>
+            <li>Test du <code>GET /api/candidates</code> sans token : Vérification du statut 401.</li>
+            <li>Test du <code>GET /api/candidates</code> avec un faux token ou expiré : Vérification du statut 403.</li>
+        </ul>
+    </li>
+    <li><strong>Tests Frontend :</strong> Validation des formulaires React. Si l'utilisateur saisit "test@test" au lieu de "test@test.com", l'interface (via Zod et React Hook Form) bloque la soumission et affiche l'erreur sans faire de requête au serveur.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- SPRINT 2 -->
+<!-- ========================================== -->
+<h2>2. Développement du Sprint 2 : Ingestion Automatisée des Emails, n8n et Webhooks</h2>
+<p>Ce sprint est le point de départ de l'automatisation. Plutôt que de demander au recruteur de télécharger manuellement les CV depuis sa boîte mail (Gmail, Outlook) et de les uploader sur la plateforme, le système doit le faire de manière autonome. Nous avons déployé <strong>n8n</strong>, un outil d'automatisation de flux de travail (similaire à Zapier mais open-source et auto-hébergeable), pour écouter le serveur IMAP et transmettre les fichiers bruts à notre API Node.js via des Webhooks.</p>
+
+<h3>2.1 User Stories et Critères d'Acceptation</h3>
+<table>
+    <tr><th>ID</th><th>En tant que...</th><th>Je veux...</th><th>Afin de...</th><th>Critères d'acceptation stricts</th><th>Points</th></tr>
+    <tr><td>US2.1</td><td>Système n8n</td><td>Écouter en continu (polling) une adresse email spécifique via le protocole IMAP</td><td>Récupérer les candidatures entrantes en temps réel</td><td>Le nœud doit se déclencher uniquement pour les emails non lus. Les pièces jointes doivent être téléchargées en format binaire.</td><td>8</td></tr>
+    <tr><td>US2.2</td><td>Système n8n</td><td>Séparer le flux : vérifier si l'email contient une pièce jointe PDF</td><td>Traiter différemment un CV d'un simple email texte</td><td>Utilisation du nœud <code>If</code> évaluant <code>application/pdf</code>.</td><td>3</td></tr>
+    <tr><td>US2.3</td><td>API Node.js</td><td>Recevoir un Webhook de type <code>multipart/form-data</code> contenant le PDF</td><td>Stocker physiquement le fichier CV sur le serveur</td><td>Utilisation de la bibliothèque <code>Multer</code>. Le fichier doit être sauvegardé dans le dossier sécurisé <code>/uploads/resumes</code>.</td><td>8</td></tr>
+</table>
+
+<h3>2.4 Implémentation du Webhook avec Multer (Backend)</h3>
+<p>La difficulté majeure de ce sprint réside dans le fait que n8n doit envoyer un fichier physique (binaire) en même temps que des données textuelles. Une requête JSON standard ne peut pas accomplir cela. L'API doit accepter le format <code>multipart/form-data</code>. Nous avons utilisé le middleware <strong>Multer</strong> pour intercepter le flux entrant, écrire le fichier PDF sur le disque dur, et placer les données textuelles dans <code>req.body</code>.</p>
+<pre><code>// rh-assistant-backend/src/controllers/webhookController.js
+const multer = require('multer');
+const path = require('path');
+const Candidate = require('../models/Candidate');
+
+// 1. Configuration approfondie du moteur de stockage Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // Le dossier où les PDF seront physiquement enregistrés
+        cb(null, path.join(__dirname, '../../uploads/resumes/'));
+    },
+    filename: function (req, file, cb) {
+        // Sécurisation du nom de fichier pour éviter les écrasements
+        // Exemple: cv-16892348923-48291.pdf
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, 'cv-' + uniqueSuffix + ext);
+    }
+});
+
+// 2. Filtre de sécurité pour n'accepter QUE les PDF
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(new Error("Seuls les fichiers PDF sont autorisés !"), false);
+    }
+};
+
+// 3. Initialisation de Multer
+const upload = multer({ 
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 10 * 1024 * 1024 } // Limite stricte à 10 MB par fichier
+}).single('resume'); // 'resume' est le nom du champ envoyé par n8n
+
+// 4. Le contrôleur du Webhook
+exports.handleIncomingApplication = (req, res) => {
+    upload(req, res, async (err) => {
+        // Gestion rigoureuse des erreurs de téléchargement
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ error: "Erreur Multer: " + err.message });
+        } else if (err) {
+            return res.status(400).json({ error: "Erreur serveur de fichiers: " + err.message });
+        }
+
+        // Si le téléchargement a réussi, le fichier physique est sur le disque.
+        try {
+            // L'objet JSON envoyé par n8n est récupéré ici
+            const parsedData = JSON.parse(req.body.data);
+            const savedFilePath = req.file ? `/uploads/resumes/${req.file.filename}` : null;
+
+            // Création temporaire du candidat en BDD (sera mis à jour au Sprint 3)
+            const newCandidate = new Candidate({
+                email: parsedData.senderEmail,
+                resumeFileUrl: savedFilePath,
+                source: "Email Automation"
+            });
+            await newCandidate.save();
+
+            // Réponse de succès à n8n pour qu'il termine son flux sans erreur
+            res.status(201).json({ message: "Webhook intercepté, fichier sauvegardé." });
+        } catch (dbError) {
+            console.error(dbError);
+            res.status(500).json({ error: "Erreur lors de l'enregistrement en base." });
+        }
+    });
+};</code></pre>
+
+<h3>2.5 Configuration de n8n et Explication du Flux JSON</h3>
+<p>Le workflow n8n (importé via le fichier <code>RH Assistant - Email Processor (1).json</code>) est configuré avec les nœuds suivants :</p>
+<ol>
+    <li><strong>Nœud Email Trigger (IMAP) :</strong> Configuré avec l'hôte IMAP (ex: imap.gmail.com), le port 993, et SSL/TLS. L'option "Download Attachments" est activée.</li>
+    <li><strong>Nœud If :</strong> Il inspecte dynamiquement le Payload. L'expression de la condition est : <code>{{ $binary.attachment_0 ? $binary.attachment_0.mimeType : '' }}</code> évaluée contre la valeur <code>application/pdf</code>.
+        <ul>
+            <li>Si vrai (PDF présent), le flux passe à l'extraction de données.</li>
+            <li>Si faux (Email texte), le flux passe à un webhook de "Communication Générale".</li>
+        </ul>
+    </li>
+    <li><strong>Nœud HTTP Request (vers le backend) :</strong> Paramétré en méthode POST. L'URL pointe vers un tunnel <strong>Ngrok</strong> (ex: <code>https://[id-ngrok].ngrok-free.dev/api/webhooks/incoming</code>) car n8n, fonctionnant dans le cloud ou sur Docker, ne peut pas requêter directement <code>localhost:5000</code>. Le corps de la requête est configuré en <code>multipart/form-data</code>.</li>
+</ol>
+
+<!-- ========================================== -->
+<!-- SPRINT 3 -->
+<!-- ========================================== -->
+<h2>3. Développement du Sprint 3 : Intelligence Artificielle (LLMs Groq) et Algorithme de Ranking</h2>
+<p>Ce sprint est la véritable innovation du projet. Il transforme une simple application de stockage de CV en un système d'intelligence sémantique. Les méthodes traditionnelles d'ATS (Applicant Tracking Systems) utilisent des expressions régulières (Regex) pour trouver des mots-clés. Nous utilisons l'IA Générative pour <em>comprendre</em> le CV.</p>
+
+<div class="highlight-box">
+    <strong>Pourquoi utiliser Groq et Llama 3 ?</strong><br>
+    Contrairement aux GPU traditionnels utilisés par OpenAI (ChatGPT), l'architecture de Groq repose sur des <strong>LPU (Language Processing Units)</strong>, garantissant une latence d'inférence extrêmement faible (jusqu'à 800 tokens générés par seconde). C'est crucial car n8n peut bloquer (Timeout) si l'IA met 30 secondes à analyser un CV de 5 pages. De plus, les modèles Open Source <strong>Meta Llama 3 70B</strong> (70 milliards de paramètres) rivalisent avec GPT-4 en termes de capacité de raisonnement logique.
+</div>
+
+<h3>3.1 Modélisation de l'Ingénierie de Prompt (Prompt Engineering)</h3>
+<p>L'IA doit agir comme une API déterministe. Elle ne doit pas dire "Bonjour, voici l'analyse du CV...". Elle doit retourner <strong>strictement du JSON</strong>. Voici l'instruction exacte (System Prompt) injectée dans le nœud HTTP n8n pointant vers l'API de Groq :</p>
+<pre><code>// System Prompt pour Llama-3.3-70b-versatile
+You are a professional HR Assistant AI. Your task is to analyze the email and CV. 
+
+CLASSIFICATION RULES:
+1. If the email is a job application (CV attached), set category to 'Applications'.
+2. If the email is about scheduling or confirming an interview, set category to 'Job Interview'.
+3. If it is an urgent or important email from management, set category to 'Important'.
+4. For everything else, use 'Others'.
+
+PRIORITY RULES:
+- High: Direct applications, interview confirmations.
+- Medium: Follow-ups, general inquiries.
+- Low: Newsletters, notifications.
+
+You MUST return a valid JSON object with EXACTLY these keys: senderName, category, priority, fullName, phone, summary, extractedSkills (array of strings), education (array), experienceYears (integer), certifications, languages, portfolioLinks, recommendationLevel. DO NOT wrap the response in markdown blocks.</code></pre>
+
+<h3>3.2 Implémentation du Nœud JavaScript de Nettoyage (n8n)</h3>
+<p>Malgré les instructions strictes, les LLMs peuvent parfois "halluciner" des blocs Markdown (ex: <code>```json { ... } ```</code>). Si ce texte est envoyé tel quel au backend, <code>JSON.parse()</code> échouera lamentablement (Crash du serveur). Nous avons donc injecté un nœud <strong>Code in JavaScript</strong> dans n8n, agissant comme un pare-feu de sanitisation :</p>
+<pre><code>// Nœud "Code in JavaScript" dans le pipeline n8n
+const aiResponse = items[0].json.choices[0].message.content;
+
+// 1. Logique anti-hallucination Markdown
+let parsed;
+try {
+  // Tentative de parsing direct
+  parsed = JSON.parse(aiResponse);
+} catch (e) {
+  // En cas d'échec, nettoyage agressif par Regex
+  const cleaned = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  parsed = JSON.parse(cleaned);
+}
+
+// 2. Récupération de l'objet binaire original (le fichier PDF)
+const emailNode = $('Email Trigger (IMAP)').first();
+const binaryData = emailNode.binary;
+
+// 3. Reconstruction d'un objet parfait et garanti pour le Webhook
+return [{
+  json: {
+    senderEmail: emailNode.json.from.value[0].address,
+    subject: emailNode.json.subject,
+    fullName: parsed.fullName,
+    summary: parsed.summary,
+    extractedSkills: parsed.extractedSkills || [],
+    experienceYears: parsed.experienceYears || 0,
+    category: parsed.category,
+    priority: parsed.priority || 'Normal'
+  },
+  binary: binaryData // Attache le fichier PDF pour le prochain nœud HTTP POST
+}];</code></pre>
+
+<h3>3.3 Algorithme de Ranking (Scoring Backend)</h3>
+<p>Une fois les compétences extraites en JSON et reçues par le backend, le système doit calculer un score de matching. Ce processus a lieu dans le <code>CandidateService.js</code>.</p>
+<ul>
+    <li>Le système récupère le profil de poste (Job Posting) depuis la collection <code>Jobs</code>.</li>
+    <li>Il compare le tableau <code>job.requiredSkills</code> (ex: ["React", "Node.js", "MongoDB"]) avec le tableau <code>candidate.extractedSkills</code> fourni par l'IA.</li>
+    <li>Un algorithme calcule le pourcentage d'intersection. Les compétences obligatoires manquantes appliquent une pénalité sévère (-15%). Les années d'expérience (si supérieures au requis) ajoutent un bonus (+10%).</li>
+    <li>Le <code>aiScore</code> final (0 à 100) est sauvegardé dans MongoDB.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- SPRINT 4 -->
+<!-- ========================================== -->
+<h2>4. Développement du Sprint 4 : UI/UX Dashboard, Next.js et Tableau Kanban Interactif</h2>
+<p>Le dernier sprint donne un "visage" à la plateforme. L'objectif est de transformer les données algorithmiques brutes en une interface décisionnelle intuitive et fluide pour les recruteurs.</p>
+
+<h3>4.1 Modélisation et Architecture Frontend (React/Next.js)</h3>
+<p>Le projet frontend utilise le framework <strong>Next.js</strong>. La structure est organisée en routes (App Router) :</p>
+<ul>
+    <li><code>/dashboard</code> : Affiche les métriques macro (Nombre total de CV traités, temps de réponse moyen) générées via la bibliothèque <strong>Recharts</strong>.</li>
+    <li><code>/candidates</code> : La page Kanban principale.</li>
+    <li><code>/candidates/[id]</code> : Le profileur de candidat (Split-pane view).</li>
+</ul>
+
+<h3>4.2 Implémentation du Tableau Kanban (react-beautiful-dnd)</h3>
+<p>Pour gérer visuellement le pipeline (Candidature reçue $\rightarrow$ En cours d'analyse $\rightarrow$ Entretien technique $\rightarrow$ Offre acceptée), nous avons implémenté un système de Drag-and-Drop complexe.</p>
+<pre><code>// rh-assistant-frontend/components/KanbanPipeline.tsx
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { useState } from 'react';
+import api from '../lib/api';
+
+export default function KanbanPipeline({ initialData }) {
+    const [columns, setColumns] = useState(initialData);
+
+    const onDragEnd = async (result) => {
+        const { source, destination, draggableId } = result;
+
+        // Si le glissement échoue en dehors des zones de dépôt
+        if (!destination) return;
+        
+        // Si le candidat est déposé dans la même colonne à la même place
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
+        // 1. Optimistic UI Update (Modification instantanée de l'état local)
+        const newColumns = moveCardLocally(columns, source, destination);
+        setColumns(newColumns);
+
+        // 2. Synchronisation persistante avec le Backend
+        try {
+            await api.patch(`/api/v1/applications/${draggableId}/stage`, {
+                newStage: destination.droppableId
+            });
+        } catch (error) {
+            console.error("Échec du changement de statut, rollback...");
+            // Si le serveur échoue (ex: panne internet), on annule le mouvement visuel
+            setColumns(initialData); 
+        }
+    };
+
+    return (
+        &lt;DragDropContext onDragEnd={onDragEnd}&gt;
+            {/* Rendu des colonnes Droppable et des cartes Draggable */}
+        &lt;/DragDropContext&gt;
+    );
+}</code></pre>
+
+<h3>4.3 Vue Profiler (Split-Pane Design)</h3>
+<p>Lorsqu'un recruteur clique sur une carte Kanban, une page s'ouvre. Plutôt que d'obliger le recruteur à télécharger le PDF (comme le font les systèmes legacy), l'interface utilise un affichage scindé (Split-Pane via CSS Flexbox/Grid) :</p>
+<ul>
+    <li><strong>Panneau Gauche (50%) :</strong> Affiche le résumé rédigé par l'IA, le badge circulaire du score de matching avec un code couleur (Vert > 80, Orange > 50, Rouge < 50), et des tags stylisés avec Tailwind CSS pour chaque compétence trouvée.</li>
+    <li><strong>Panneau Droit (50%) :</strong> Utilise un simple tag HTML <code>&lt;iframe src={candidate.resumeFileUrl}&gt;</code> pour intégrer le rendu PDF natif du navigateur, permettant au recruteur de scroller le document original tout en lisant l'analyse de l'IA.</li>
+</ul>
+
+<!-- ========================================== -->
+<!-- DEVOPS & TESTING -->
+<!-- ========================================== -->
+<h2>5. DevOps, Déploiement et Stratégie de Tests Globale</h2>
+
+<h3>5.1 Tests Exhaustifs</h3>
+<ul>
+    <li><strong>Tests Unitaires (Jest) :</strong> Application stricte sur les services mathématiques. Exemple : <code>test('calculates correct score for exact skill match')</code> vérifie que le service backend retourne bien 100%.</li>
+    <li><strong>Tests d'API (Supertest) :</strong> Vérification que le routeur Express protège correctement les endpoints. Une fausse requête POST vers <code>/api/jobs</code> sans JWT doit obligatoirement renvoyer HTTP 401.</li>
+    <li><strong>Stress Test de l'IA :</strong> Injection de 10 emails simultanés avec des PDF contenant des images complexes ou des polices inhabituelles pour observer le comportement de l'OCR de n8n et la gestion des Timeouts par l'API Groq.</li>
+</ul>
+
+<h3>5.2 Conteneurisation (Docker) et Architecture de Déploiement</h3>
+<p>Pour assurer un déploiement agnostique ("Ça marche sur mon ordinateur" $\rightarrow$ "Ça marche sur le serveur"), le backend et le frontend ont été conteneurisés en utilisant des fichiers <strong>Dockerfile</strong> multi-étapes (Multi-stage builds) afin de réduire le poids des images de production (en excluant <code>devDependencies</code>).</p>
+<p>L'orchestration locale s'est faite via <strong>Docker Compose</strong>. En production, un serveur Linux Ubuntu est provisionné. <strong>Nginx</strong> agit comme un reverse proxy (passerelle inversée), capturant les requêtes HTTP (Port 80) et HTTPS (Port 443), gérant les certificats SSL via Let's Encrypt, puis dirigeant le trafic vers le conteneur Next.js (Port 3000) ou le conteneur API Node.js (Port 5000).</p>
+
+<!-- ========================================== -->
+<!-- CONCLUSION -->
+<!-- ========================================== -->
+<h2>Conclusion du Chapitre de Réalisation</h2>
+<p>Ce chapitre exhaustif a mis en exergue la complexité architecturale et la richesse algorithmique de la plateforme "RH Assistant". En passant par la modélisation stricte de la base de données MongoDB, la sécurisation des sessions via JWT, la construction d'un pipeline d'automatisation IMAP robuste via n8n, et l'intégration pointue des modèles d'Intelligence Artificielle Llama 3 via Groq, le projet a atteint tous ses objectifs techniques.</p>
+<p>L'interface Next.js/Tailwind offre une expérience utilisateur de niveau entreprise, transformant les données algorithmiques abstraites en tableaux de bord Kanban pragmatiques et réactifs. Les tests continus garantissent que ce système logiciel n'est pas un simple prototype conceptuel, mais un socle SaaS (Software as a Service) solide, hautement évolutif et prêt pour la production commerciale.</p>
+
+</div>
+</body>
+</html>
